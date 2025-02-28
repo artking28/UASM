@@ -27,8 +27,12 @@ func Tokenize(filename string) ([]models.Token, error) {
 			buffer.WriteRune(run)
 			continue
 		}
-		tk := models.NewToken(models.TOKEN_ID, 1, []rune(buffer.String())...)
-		models.AppendToken(&ret, tk)
+		if buffer.Len() > 0 {
+			var tk models.Token
+			tk = models.NewToken(models.TOKEN_ID, 1, []rune(buffer.String())...)
+			models.AppendToken(&ret, models.ResolveTokenId(tk))
+			buffer.Reset()
+		}
 
 		switch run {
 		case '\n':
@@ -53,7 +57,9 @@ func Tokenize(filename string) ([]models.Token, error) {
 			tk := models.NewToken(models.TOKEN_SLASH, 1, run)
 			if runes[i+1] == '/' {
 				isComment = true
+				i += 1
 				models.AppendToken(&ret, tk)
+				break
 			}
 			models.AppendToken(&ret, tk)
 			break

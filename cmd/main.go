@@ -14,4 +14,7 @@ func main() {
 	}
 
 	fmt.Printf("Ok! %d tokens found.\n", len(tokens))
+	// for _, tk := range tokens {
+	// 	print(tk.String())
+	// }
 }

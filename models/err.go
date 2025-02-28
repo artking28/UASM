@@ -14,7 +14,7 @@ type (
 	}
 )
 
-func (this *Err) Error() string {
+func (this Err) Error() string {
 	return fmt.Sprintf("error %.4d | %s\n", this.Code, this.Msg)
 }
 
@@ -38,7 +38,7 @@ const (
 	UnkownFailureErrLabel       ErrLabel = "error.unkown.failure"
 )
 
-func NewNilPointerExceptionErr() Err {
+func GetNilPointerExceptionErr() Err {
 	return Err{
 		Code:  NilPointerExceptionErrCode,
 		Label: NilPointerExceptionErrLabel,
@@ -46,7 +46,7 @@ func NewNilPointerExceptionErr() Err {
 	}
 }
 
-func NewDivideByZeroErr() Err {
+func GetDivideByZeroErr() Err {
 	return Err{
 		Code:  DivideByZeroErrCode,
 		Label: DivideByZeroErrLabel,
@@ -54,7 +54,7 @@ func NewDivideByZeroErr() Err {
 	}
 }
 
-func NewFileNotFoundErr() Err {
+func GetFileNotFoundErr() Err {
 	return Err{
 		Code:  FileNotFoundErrCode,
 		Label: FileNotFoundErrLabel,
@@ -62,7 +62,7 @@ func NewFileNotFoundErr() Err {
 	}
 }
 
-func NewInvalidArgumentErr() Err {
+func GetInvalidArgumentErr() Err {
 	return Err{
 		Code:  InvalidArgumentErrCode,
 		Label: InvalidArgumentErrLabel,
@@ -70,23 +70,23 @@ func NewInvalidArgumentErr() Err {
 	}
 }
 
-func NewEmptyFileErr() Err {
+func GetEmptyFileErr(filename string) Err {
 	return Err{
 		Code:  EmptyFileErrCode,
 		Label: EmptyFileErrLabel,
-		Msg:   "",
+		Msg:   fmt.Sprintf("The file '%s' is empty.", filename),
 	}
 }
 
-func NewUnexpectedTokenErr() Err {
+func GetUnexpectedTokenErr(filename string, char rune, line int) Err {
 	return Err{
 		Code:  UnexpectedTokenErrCode,
 		Label: UnexpectedTokenErrLabel,
-		Msg:   "",
+		Msg:   fmt.Sprintf("Unexpected token '%s' in the %dº line of the file '%s'.", string(char), line, filename),
 	}
 }
 
-func NewUnkownErr() Err {
+func GetUnkownErr() Err {
 	return Err{
 		Code:  UnkownFailureErrCode,
 		Label: UnkownFailureErrLabel,

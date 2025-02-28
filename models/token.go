@@ -5,10 +5,26 @@ type (
 
 	Token struct {
 		Kind   TokenKindEnum
-		Value  []byte
+		Value  []rune
 		Repeat int
 	}
 )
+
+func NewToken(kind TokenKindEnum, repeat int, value ...rune) Token {
+	return Token{kind, value, repeat}
+}
+
+func AppendToken(tokens *[]Token, token Token) {
+	if tokens == nil {
+		tokens = &[]Token{}
+	}
+	len := len((*tokens))
+	if len > 0 && (*tokens)[len-1].Kind == token.Kind && string((*tokens)[len-1].Value) == string(token.Value) {
+		(*tokens)[len-1].Repeat = (*tokens)[len-1].Repeat + 1
+		return
+	}
+	*tokens = append(*tokens, token)
+}
 
 const (
 
@@ -18,6 +34,7 @@ const (
 	TOKEN_SPACE TokenKindEnum = iota
 	TOKEN_BREAK_LINE
 	TOKEN_TAB
+	TOKEN_ID
 	TOKEN_NUMBER
 	TOKEN_COMMA
 	TOKEN_COLON

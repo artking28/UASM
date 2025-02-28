@@ -1,22 +1,17 @@
 package main
 
 import (
-	"UASM/neander"
+	"UASM/compiler"
 	"fmt"
-	"os"
+	"log"
 )
 
 func main() {
 
-	bytes, err := os.ReadFile("misc/program.mem")
+	tokens, err := compiler.Tokenize("misc/teste.uasm")
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err.Error())
 	}
 
-	result, program := neander.RunProgram(bytes)
-	if program == nil {
-		panic("something went wrong during the runtime.\n")
-	}
-
-	fmt.Printf("success! {ac: %d, pc: %d}\n", result.Ac, result.Pc)
+	fmt.Printf("Ok! %d tokens found.\n", len(tokens))
 }

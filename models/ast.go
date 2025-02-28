@@ -11,8 +11,7 @@ type (
 	}
 
 	Stmt interface {
-		Where() Pos
-		WriteMemASM() string
+		WriteMemASM() []byte
 	}
 
 	CommentStmt struct {
@@ -58,4 +57,8 @@ func NewDoubleInstructionStmt(code TokenKindEnum, pos Pos, left, right Token) Do
 		SingleInstructionStmt: NewSingleInstructionStmt(code, pos, left),
 		Right:                 right,
 	}
+}
+
+func (this CommentStmt) WriteMemASM() []byte {
+	return []byte{}
 }

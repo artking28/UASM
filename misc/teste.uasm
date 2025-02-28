@@ -1,5 +1,5 @@
 
-get 0b11 // Coloca 3 no acumulador
+get 3 // Coloca 3 no acumulador
 cpy m10, 2 // Coloca 2 na 10º memoria
 cpy m11, 4 // Coloca 3 no 11º memoria
 inc // Incrementa no acumulador

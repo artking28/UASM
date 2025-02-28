@@ -72,5 +72,7 @@ func Tokenize(filename string) ([]models.Token, error) {
 		}
 	}
 
+	tk := models.NewToken(models.TOKEN_EOF, 1, '0')
+	models.AppendToken(&ret, tk)
 	return ret, nil
 }

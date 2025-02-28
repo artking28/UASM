@@ -65,6 +65,7 @@ const (
 	TOKEN_COLON
 	TOKEN_MEM
 	TOKEN_SLASH
+	TOKEN_EOF
 
 	// #########################
 	//         MINMONICS
@@ -128,6 +129,9 @@ func (this Token) String() string {
 	case TOKEN_SLASH:
 		s = "TOKEN_SLASH"
 		break
+	case TOKEN_EOF:
+		s = "TOKEN_EOF"
+		break
 	case TOKEN_GET:
 		s = "TOKEN_GET"
 		break
@@ -185,6 +189,8 @@ func (this Token) String() string {
 		v = "\\n"
 	} else if this.Kind == TOKEN_TAB {
 		v = "\\t"
+	} else if this.Kind == TOKEN_EOF {
+		v = "\\0"
 	} else if this.Kind == TOKEN_MEM || this.Kind == TOKEN_NUMBER {
 		v = strconv.Itoa(int(this.Value[0]))
 	}

@@ -1,0 +1,9 @@
+
+get 3 // Coloca 3 no acumulador
+cpy m10, 2 // Coloca 2 na 10º memoria
+cpy m11, 4 // Coloca 3 no 11º memoria
+inc // Incrementa no acumulador
+inc // Incrementa no acumulador
+add m10 // Adiciona o valor da 10º memoria no acumulador
+add m11 // Adiciona o valor da 11º memoria no acumulador
+hlt // Sai do programa

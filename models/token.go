@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 type (
@@ -23,9 +24,9 @@ func AppendToken(tokens *[]Token, token Token) {
 	if tokens == nil {
 		tokens = &[]Token{}
 	}
-	len := len((*tokens))
-	if len > 0 && (*tokens)[len-1].Kind == token.Kind && string((*tokens)[len-1].Value) == string(token.Value) {
-		(*tokens)[len-1].Repeat = (*tokens)[len-1].Repeat + 1
+	count := len(*tokens)
+	if count > 0 && (*tokens)[count-1].Kind == token.Kind && string((*tokens)[count-1].Value) == string(token.Value) {
+		(*tokens)[count-1].Repeat = (*tokens)[count-1].Repeat + 1
 		return
 	}
 	*tokens = append(*tokens, token)
@@ -36,18 +37,53 @@ func ResolveTokenId(token Token) Token {
 		return token
 	}
 	value := string(token.Value)
-	len := len(value)
+	count := len(value)
 	if value[0] == 'm' {
 		mem, err := strconv.ParseInt(value[1:], 10, 64)
 		if err == nil {
 			return NewToken(TOKEN_MEM, 1, rune(mem))
 		}
-	} else if len > 2 && (value[:2] == "0b" || value[:2] == "0o" || value[:2] == "0x") {
-		num, err := strconv.ParseInt(value[:len], 0, 64)
+	} else if count > 2 && (value[:2] == "0b" || value[:2] == "0o" || value[:2] == "0x") {
+		num, err := strconv.ParseInt(value[:count], 0, 64)
 		if err == nil {
 			return NewToken(TOKEN_NUMBER, 1, rune(num))
 		}
+	} else if strings.ToUpper(value) == ("GET") {
+		return NewToken(TOKEN_GET, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("SET") {
+		return NewToken(TOKEN_SET, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("CPY") {
+		return NewToken(TOKEN_CPY, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("INC") {
+		return NewToken(TOKEN_INC, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("DEC") {
+		return NewToken(TOKEN_DEC, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("NEG") {
+		return NewToken(TOKEN_NEG, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("NOT") {
+		return NewToken(TOKEN_NOT, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("ADD") {
+		return NewToken(TOKEN_ADD, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("MUL") {
+		return NewToken(TOKEN_MUL, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("AND") {
+		return NewToken(TOKEN_AND, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("ORR") {
+		return NewToken(TOKEN_ORR, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("XOR") {
+		return NewToken(TOKEN_XOR, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("CMP") {
+		return NewToken(TOKEN_CMP, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("JMP") {
+		return NewToken(TOKEN_JMP, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("JIZ") {
+		return NewToken(TOKEN_JIZ, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("JNZ") {
+		return NewToken(TOKEN_JNZ, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("HLT") {
+		return NewToken(TOKEN_HLT, 1, []rune(value)...)
 	}
+
 	return token
 }
 

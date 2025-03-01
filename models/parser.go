@@ -5,7 +5,7 @@ import (
 )
 
 type Parser struct {
-	output []Stmt
+	output Ast
 	tokens []Token
 	cursor int
 	column int
@@ -14,15 +14,16 @@ type Parser struct {
 
 func NewParser(tokens []Token) Parser {
 	return Parser{
+		output: Ast{},
 		tokens: tokens,
 		cursor: 0,
-		column: 0,
+		column: 1,
 		line:   1,
 	}
 }
 
 func (this *Parser) WriteProgram() (ret []byte) {
-	vec := mgu.VecMap(this.output, func(stmt Stmt) []byte {
+	vec := mgu.VecMap(this.output.Statements, func(stmt Stmt) []byte {
 		return stmt.WriteMemASM()
 	})
 	for _, bytes := range vec {
@@ -32,7 +33,11 @@ func (this *Parser) WriteProgram() (ret []byte) {
 }
 
 func (this *Parser) Inject(stmts ...Stmt) {
-	this.output = append(this.output, stmts...)
+	this.output.Statements = append(this.output.Statements, stmts...)
+}
+
+func (this *Parser) Inspect() {
+	this.output.Inspect()
 }
 
 func (this *Parser) Get(n int) *Token {
@@ -50,7 +55,7 @@ func (this *Parser) Where() Pos {
 }
 
 func (this *Parser) NextLine() {
-	this.column = 0
+	this.column = 1
 	this.line += 1
 }
 
@@ -58,6 +63,8 @@ func (this *Parser) Consume(n int) {
 	if this.cursor >= len(this.tokens) {
 		return
 	}
-	this.column += n
+	for i := 0; i < n; i++ {
+		this.column += len(this.tokens[this.cursor+i].Value)
+	}
 	this.cursor += n
 }

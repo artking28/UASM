@@ -1,41 +1,53 @@
 package main
 
 import (
+	"UASM/compiler"
+	"UASM/models"
 	"UASM/neander"
+	"fmt"
 	"log"
 	"os"
-
 )
 
 func main() {
-	// outputFile, inputFile := "output.mem", "misc/teste.uasm"
-	// tokens, err := compiler.Tokenize(inputFile)
-	// if err != nil {
-	// 	log.Fatal(err.Error())
-	// }
-	// 
-	// _ = outputFile
-	// fmt.Printf("Ok! %d tokens found.\n", len(tokens))
-	// for _, tk := range tokens {
-	// 	print(tk.String())
-	// }
-	//
-	// parser := models.NewParser(tokens)
-	// compiler.ParseAll(&parser)
-	// err = os.WriteFile(outputFile, parser.WriteProgram(), 0744)
-	// if err != nil {
-	// 	log.Fatal(err.Error())
-	// }
+	//InterpreterTest()
+	AssemblerTest()
+}
 
-	bytes, err := os.ReadFile("misc/neander.mem")
+func AssemblerTest() {
+	outputFile, inputFile := "output.mem", "misc/teste.uasm"
+	tokens, err := compiler.Tokenize(inputFile)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	neander.PrintProgram(bytes)
-	// if err != nil {
-	// 	log.Fatal(err.Error())
-	// }
+	_ = outputFile
+	//fmt.Printf("Ok! %d tokens found.\n", len(tokens))
+	//for i, tk := range tokens {
+	//    print(i, " ", tk.String())
+	//}
 
-	// fmt.Printf("Ac = %d, Pc = %d\n", pr.Ac, pr.Pc)
+	parser := models.NewParser(tokens)
+	err = compiler.ParseAll(&parser)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	//err = os.WriteFile(outputFile, parser.WriteProgram(), 0744)
+	//if err != nil {
+	//    log.Fatal(err.Error())
+	//}
+
+	parser.Inspect()
+}
+
+func InterpreterTest() {
+	bytes, err := os.ReadFile("misc/neander.mem")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	neander.PrintProgram(bytes)
+
+	pr, _ := neander.RunProgram(bytes)
+	fmt.Printf("Ac = %d, Pc = %d\n", pr.Ac, pr.Pc)
 }

@@ -25,6 +25,7 @@ const (
 	DivideByZeroErrCode
 	InvalidArgumentErrCode
 	UnexpectedTokenErrCode
+	ExpectedTokenErrCode
 	InvalidMinmonicErrCode
 	UnkownFailureErrCode
 
@@ -34,6 +35,7 @@ const (
 	DivideByZeroErrLabel        ErrLabel = "error.divide.by.zero"
 	InvalidArgumentErrLabel     ErrLabel = "error.invalid.argument"
 	UnexpectedTokenErrLabel     ErrLabel = "error.unexpected.token"
+	ExpectedTokenErrLabel       ErrLabel = "error.expected.token"
 	InvalidMinmonicErrLabel     ErrLabel = "error.invalid.minmonic"
 	UnkownFailureErrLabel       ErrLabel = "error.unkown.failure"
 )
@@ -75,6 +77,14 @@ func GetEmptyFileErr(filename string) Err {
 		Code:  EmptyFileErrCode,
 		Label: EmptyFileErrLabel,
 		Msg:   fmt.Sprintf("The file '%s' is empty.", filename),
+	}
+}
+
+func EexpectedTokenErr(filename string, line int) Err {
+	return Err{
+		Code:  UnexpectedTokenErrCode,
+		Label: UnexpectedTokenErrLabel,
+		Msg:   fmt.Sprintf("Missing token in the %dº line of the file '%s'.", line, filename),
 	}
 }
 

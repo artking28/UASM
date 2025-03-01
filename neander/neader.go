@@ -87,6 +87,7 @@ func PrintProgram(program []byte) {
 		mnemonic := program[i]
 		addr := int(program[i+2])
 		addrV := program[addr*2+padding]
+		fmt.Printf("[%.3d]", i/4)
 		switch mnemonic {
 		case NOP:
 			fmt.Printf("\tNOP\n")
@@ -113,10 +114,10 @@ func PrintProgram(program []byte) {
 			fmt.Printf("\tJMP %d(line=%d)\n", addr, addrV)
 			break
 		case JN:
-			fmt.Printf("\tJN %d(line=%d)\n", addr, addrV)
+			fmt.Printf("\tJN  %d(line=%d)\n", addr, addrV)
 			break
 		case JZ:
-			fmt.Printf("\tJZ %d(line=%d)\n", addr, addrV)
+			fmt.Printf("\tJZ  %d(line=%d)\n", addr, addrV)
 			break
 		case HLT:
 			fmt.Printf("\tHLT\n")

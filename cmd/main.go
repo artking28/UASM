@@ -10,8 +10,8 @@ import (
 )
 
 func main() {
-	//InterpreterTest()
-	AssemblerTest()
+	InterpreterTest()
+	//AssemblerTest()
 }
 
 func AssemblerTest() {
@@ -42,12 +42,12 @@ func AssemblerTest() {
 }
 
 func InterpreterTest() {
-	bytes, err := os.ReadFile("misc/neander.mem")
+	bytes, err := os.ReadFile("misc/TESTEHEREDIA.mem")
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	neander.PrintProgram(bytes)
+	//neander.PrintProgram(bytes, false, true)
 
-	pr, _ := neander.RunProgram(bytes)
-	fmt.Printf("Ac = %d, Pc = %d\n", pr.Ac, pr.Pc)
+	pr, _ := neander.RunProgram(bytes, false, true)
+	fmt.Printf("\nResult:\n\tAc = %x, Pc = %x, Z = %v, N = %v\n", pr.Ac, pr.Pc, pr.Ac == 0, int8(pr.Ac) < 0)
 }

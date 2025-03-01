@@ -20,7 +20,7 @@ const (
 	HLT = 240 // Encerra o ciclo de busca-decodificação-execução
 )
 
-func RunProgram(program []byte) (Result, []byte) {
+func RunProgram(program []byte, hexa, printFinalState bool) (Result, []byte) {
 	padding := 4
 	var result Result
 	for i := padding; i < len(program); i += padding {
@@ -52,77 +52,148 @@ func RunProgram(program []byte) (Result, []byte) {
 			result.Ac &= program[addrValueIndex]
 			break
 		case NOT:
+			i -= 2
 			result.Pc += 1
-			result.Ac ^= result.Ac
+			result.Ac = ^result.Ac
 			break
 		case JMP:
-			result.Pc += 2
-			i = int(program[addrValueIndex])
+			result.Pc = addr
+			i = addrValueIndex - padding
 			break
 		case JN:
-			result.Pc += 2
+			result.Pc = addr
 			if result.Ac != 0 {
-				i = int(program[addrValueIndex])
+				i = addrValueIndex - padding
 			}
 			continue
 		case JZ:
-			result.Pc += 2
+			result.Pc = addr
 			if result.Ac == 0 {
-				i = int(program[addrValueIndex])
+				i = addrValueIndex - padding
 			}
 			continue
 		case HLT:
 			result.Pc += 1
 			i = len(program)
 			break
+		default:
+			panic("Unknown minmonic, corrupted file.")
 		}
 	}
+
+	fmt.Print("\nFinal memory state:\n\t")
+	if printFinalState {
+		for i, b := range program {
+			if hexa {
+				fmt.Printf("[%.3x] %.2x ", i, b)
+			} else {
+				fmt.Printf("[%.3d] %.2x ", i, b)
+			}
+			if (i+1)%16 == 0 {
+				fmt.Print("\n\t")
+			}
+		}
+	}
+
 	return result, program
 }
 
-func PrintProgram(program []byte) {
+func PrintProgram(program []byte, hexa, printTail bool) {
 	padding := 4
-	print("\nProgram:\n")
+	fmt.Print("\nProgram:\n")
 	for i := padding; i < len(program); i += padding {
 		mnemonic := program[i]
 		addr := int(program[i+2])
 		addrV := program[addr*2+padding]
-		fmt.Printf("[%.3d]", i/4)
+		if hexa {
+			fmt.Printf("\t[0x%.2x]", i/2-2)
+		} else {
+			fmt.Printf("\t[%.3d]", i/2-2)
+		}
 		switch mnemonic {
 		case NOP:
-			fmt.Printf("\tNOP\n")
+			fmt.Printf(" NOP\n")
 			break
 		case STA:
-			fmt.Printf("\tSTA %d(value=%d)\n", addr, addrV)
+			str := fmt.Sprintf(" STA %.3d(value=%d)\n", addr, addrV)
+			if hexa {
+				str = fmt.Sprintf(" STA 0x%.2x(value=0x%.2x)\n", addr, addrV)
+			}
+			fmt.Print(str)
 			break
 		case LDA:
-			fmt.Printf("\tLDA %d(value=%d)\n", addr, addrV)
+			str := fmt.Sprintf(" LDA %.3d(value=%d)\n", addr, addrV)
+			if hexa {
+				str = fmt.Sprintf(" LDA 0x%.2x(value=0x%.2x)\n", addr, addrV)
+			}
+			fmt.Print(str)
 			break
 		case ADD:
-			fmt.Printf("\tADD %d(value=%d)\n", addr, addrV)
+			str := fmt.Sprintf(" ADD %.3d(value=%d)\n", addr, addrV)
+			if hexa {
+				str = fmt.Sprintf(" ADD 0x%.2x(value=0x%.2x)\n", addr, addrV)
+			}
+			fmt.Print(str)
 			break
 		case OR:
-			fmt.Printf("\tOR %d(value=%d)\n", addr, addrV)
+			str := fmt.Sprintf(" OR %.3d(value=%d)\n", addr, addrV)
+			if hexa {
+				str = fmt.Sprintf(" OR 0x%.2x(value=0x%.2x)\n", addr, addrV)
+			}
+			fmt.Print(str)
 			break
 		case AND:
-			fmt.Printf("\tAND %d(value=%d)\n", addr, addrV)
+			str := fmt.Sprintf(" AND %.3d(value=%d)\n", addr, addrV)
+			if hexa {
+				str = fmt.Sprintf(" AND 0x%.2x(value=0x%.2x)\n", addr, addrV)
+			}
+			fmt.Print(str)
 			break
 		case NOT:
-			fmt.Printf("\tNOT\n")
+			i -= 2
+			fmt.Printf(" NOT\n")
 			break
 		case JMP:
-			fmt.Printf("\tJMP %d(line=%d)\n", addr, addrV)
+			str := fmt.Sprintf(" JMP %.3d\n", addr)
+			if hexa {
+				str = fmt.Sprintf(" JMP 0x%.2x\n", addr)
+			}
+			fmt.Print(str)
 			break
 		case JN:
-			fmt.Printf("\tJN  %d(line=%d)\n", addr, addrV)
+			str := fmt.Sprintf(" JN  %.3d\n", addr)
+			if hexa {
+				str = fmt.Sprintf(" JN  0x%.2x\n", addr)
+			}
+			fmt.Print(str)
 			break
 		case JZ:
-			fmt.Printf("\tJZ  %d(line=%d)\n", addr, addrV)
+			str := fmt.Sprintf(" JZ  %.3d\n", addr)
+			if hexa {
+				str = fmt.Sprintf(" JZ  0x%.2x\n", addr)
+			}
+			fmt.Print(str)
 			break
 		case HLT:
-			fmt.Printf("\tHLT\n")
+			fmt.Printf(" HLT\n")
 			i = len(program)
 			break
 		}
 	}
+
+	if printTail {
+		fmt.Print("\nPure memory:\n\t")
+		for i, b := range program {
+			if hexa {
+				fmt.Printf("[%.3x] %.2x ", i, b)
+			} else {
+				fmt.Printf("[%.3d] %.2x ", i, b)
+			}
+			if (i+1)%16 == 0 {
+				fmt.Print("\n\t")
+			}
+		}
+	}
+
+	fmt.Println()
 }

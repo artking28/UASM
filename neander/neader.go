@@ -1,6 +1,9 @@
 package neander
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 type Result struct {
 	Ac, Pc byte
@@ -77,7 +80,7 @@ func RunProgram(program []byte, hexa, printFinalState bool) (Result, []byte) {
 			i = len(program)
 			break
 		default:
-			panic("Unknown minmonic, corrupted file.")
+			log.Fatalf("Unknown minmonic, corrupted file.")
 		}
 	}
 
@@ -115,37 +118,37 @@ func PrintProgram(program []byte, hexa, printTail bool) {
 			fmt.Printf(" NOP\n")
 			break
 		case STA:
-			str := fmt.Sprintf(" STA %.3d(value=%d)\n", addr, addrV)
+			str := fmt.Sprintf(" STA %.3d(value = %d)\n", addr, int8(addrV))
 			if hexa {
-				str = fmt.Sprintf(" STA 0x%.2x(value=0x%.2x)\n", addr, addrV)
+				str = fmt.Sprintf(" STA 0x%.2x(value = 0x%.2x)\n", addr, addrV)
 			}
 			fmt.Print(str)
 			break
 		case LDA:
-			str := fmt.Sprintf(" LDA %.3d(value=%d)\n", addr, addrV)
+			str := fmt.Sprintf(" LDA %.3d(value = %d)\n", addr, int8(addrV))
 			if hexa {
-				str = fmt.Sprintf(" LDA 0x%.2x(value=0x%.2x)\n", addr, addrV)
+				str = fmt.Sprintf(" LDA 0x%.2x(value = 0x%.2x)\n", addr, addrV)
 			}
 			fmt.Print(str)
 			break
 		case ADD:
-			str := fmt.Sprintf(" ADD %.3d(value=%d)\n", addr, addrV)
+			str := fmt.Sprintf(" ADD %.3d(value = %d)\n", addr, int8(addrV))
 			if hexa {
-				str = fmt.Sprintf(" ADD 0x%.2x(value=0x%.2x)\n", addr, addrV)
+				str = fmt.Sprintf(" ADD 0x%.2x(value = 0x%.2x)\n", addr, addrV)
 			}
 			fmt.Print(str)
 			break
 		case OR:
-			str := fmt.Sprintf(" OR %.3d(value=%d)\n", addr, addrV)
+			str := fmt.Sprintf(" OR %.3d(value = %d)\n", addr, int8(addrV))
 			if hexa {
-				str = fmt.Sprintf(" OR 0x%.2x(value=0x%.2x)\n", addr, addrV)
+				str = fmt.Sprintf(" OR 0x%.2x(value = 0x%.2x)\n", addr, addrV)
 			}
 			fmt.Print(str)
 			break
 		case AND:
-			str := fmt.Sprintf(" AND %.3d(value=%d)\n", addr, addrV)
+			str := fmt.Sprintf(" AND %.3d(value = %d)\n", addr, int8(addrV))
 			if hexa {
-				str = fmt.Sprintf(" AND 0x%.2x(value=0x%.2x)\n", addr, addrV)
+				str = fmt.Sprintf(" AND 0x%.2x(value = 0x%.2x)\n", addr, addrV)
 			}
 			fmt.Print(str)
 			break

@@ -17,8 +17,6 @@ func NewParser(tokens []Token) Parser {
 		output: Ast{},
 		tokens: tokens,
 		cursor: 0,
-		column: 1,
-		line:   1,
 	}
 }
 
@@ -47,24 +45,20 @@ func (this *Parser) Get(n int) *Token {
 	return &this.tokens[this.cursor+n]
 }
 
-func (this *Parser) Where() Pos {
-	return Pos{
-		Column: int64(this.column),
-		Line:   int64(this.line),
-	}
-}
-
-func (this *Parser) NextLine() {
-	this.column = 1
-	this.line += 1
-}
-
 func (this *Parser) Consume(n int) {
 	if this.cursor >= len(this.tokens) {
 		return
 	}
 	for i := 0; i < n; i++ {
-		this.column += len(this.tokens[this.cursor+i].Value)
+		tk := this.tokens[this.cursor+i]
+		if tk.Kind == TOKEN_BREAK_LINE {
+			this.column = 1
+			this.line += 1
+		}
+		this.column += len(tk.Value)
+		if tk.Kind == TOKEN_MEM {
+			this.column++
+		}
 	}
 	this.cursor += n
 }

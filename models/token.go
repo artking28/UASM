@@ -10,14 +10,15 @@ type (
 	TokenKindEnum int
 
 	Token struct {
-		Kind   TokenKindEnum
-		Value  []rune
-		Repeat int
+		Pos    Pos           `json:"-"`
+		Kind   TokenKindEnum `json:"kind"`
+		Value  []rune        `json:"value"`
+		Repeat int           `json:"repeat"`
 	}
 )
 
-func NewToken(kind TokenKindEnum, repeat int, value ...rune) Token {
-	return Token{kind, value, repeat}
+func NewToken(pos Pos, kind TokenKindEnum, repeat int, value ...rune) Token {
+	return Token{pos, kind, value, repeat}
 }
 
 func AppendToken(tokens *[]Token, token Token) {
@@ -41,46 +42,46 @@ func ResolveTokenId(token Token) Token {
 	if value[0] == 'm' {
 		mem, err := strconv.ParseInt(value[1:], 10, 64)
 		if err == nil {
-			return NewToken(TOKEN_MEM, 1, rune(mem))
+			return NewToken(token.Pos, TOKEN_MEM, 1, rune(mem))
 		}
 	} else if strings.ToUpper(value) == ("GET") {
-		return NewToken(TOKEN_GET, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_GET, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("SET") {
-		return NewToken(TOKEN_SET, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_SET, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("CPY") {
-		return NewToken(TOKEN_CPY, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_CPY, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("INC") {
-		return NewToken(TOKEN_INC, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_INC, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("DEC") {
-		return NewToken(TOKEN_DEC, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_DEC, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("NEG") {
-		return NewToken(TOKEN_NEG, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_NEG, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("NOT") {
-		return NewToken(TOKEN_NOT, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_NOT, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("ADD") {
-		return NewToken(TOKEN_ADD, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_ADD, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("MUL") {
-		return NewToken(TOKEN_MUL, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_MUL, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("AND") {
-		return NewToken(TOKEN_AND, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_AND, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("ORR") {
-		return NewToken(TOKEN_ORR, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_ORR, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("XOR") {
-		return NewToken(TOKEN_XOR, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_XOR, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("CMP") {
-		return NewToken(TOKEN_CMP, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_CMP, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("JMP") {
-		return NewToken(TOKEN_JMP, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_JMP, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("JIZ") {
-		return NewToken(TOKEN_JIZ, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_JIZ, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("JNZ") {
-		return NewToken(TOKEN_JNZ, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_JNZ, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("HLT") {
-		return NewToken(TOKEN_HLT, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_HLT, 1, []rune(value)...)
 	} else {
 		num, err := strconv.ParseInt(value[:count], 0, 64)
 		if err == nil {
-			return NewToken(TOKEN_NUMBER, 1, rune(num))
+			return NewToken(token.Pos, TOKEN_NUMBER, 1, rune(num))
 		}
 	}
 

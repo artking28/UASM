@@ -15,7 +15,6 @@ func ParseAll(parser *models.Parser) error {
 			if err != nil {
 				return err
 			}
-			parser.NextLine()
 			break
 		case models.TOKEN_INC, models.TOKEN_DEC, models.TOKEN_NEG, models.TOKEN_NOT, models.TOKEN_HLT:
 			err := ParsePureInstruction(parser)
@@ -36,9 +35,6 @@ func ParseAll(parser *models.Parser) error {
 				return err
 			}
 			break
-		case models.TOKEN_BREAK_LINE:
-			parser.NextLine()
-			break
 		default:
 			break
 		}
@@ -48,7 +44,6 @@ func ParseAll(parser *models.Parser) error {
 }
 
 func ParseComment(parser *models.Parser) error {
-	pos := parser.Where()
 	var comment string
 	h0 := parser.Get(0)
 	if h0 != nil && h0.Kind == models.TOKEN_SLASH && h0.Repeat >= 2 {
@@ -60,19 +55,18 @@ func ParseComment(parser *models.Parser) error {
 		comment += string(here.Value)
 		parser.Consume(1)
 	}
-	parser.Inject(models.NewCommentStmt(comment, pos))
+	parser.Inject(models.NewCommentStmt(comment, h0.Pos))
 	return nil
 }
 
 func ParsePureInstruction(parser *models.Parser) error {
-	pos := parser.Where()
 	h0 := parser.Get(0)
 	if h0 == nil {
 		return errors.New(string(models.ExpectedTokenErrLabel))
 	}
 	switch h0.Kind {
 	case models.TOKEN_INC, models.TOKEN_DEC, models.TOKEN_NEG, models.TOKEN_NOT, models.TOKEN_HLT:
-		parser.Inject(models.NewPureInstructionStmt(h0.Kind, pos))
+		parser.Inject(models.NewPureInstructionStmt(h0.Kind, h0.Pos))
 		parser.Consume(1)
 		break
 	default:
@@ -82,7 +76,6 @@ func ParsePureInstruction(parser *models.Parser) error {
 }
 
 func ParseSingleInstruction(parser *models.Parser) error {
-	pos := parser.Where()
 	h0, h1 := parser.Get(0), parser.Get(2)
 	if h0 == nil || h1 == nil {
 		return errors.New(string(models.ExpectedTokenErrLabel))
@@ -103,14 +96,13 @@ func ParseSingleInstruction(parser *models.Parser) error {
 	default:
 		return errors.New(string(models.UnexpectedTokenErrLabel))
 	}
-	parser.Inject(models.NewSingleInstructionStmt(h0.Kind, pos, *h1))
+	parser.Inject(models.NewSingleInstructionStmt(h0.Kind, h0.Pos, *h1))
 	parser.Consume(2)
 	return nil
 }
 
 // ParseDoubleInstruction parses: Instruction space memAddress space comma space (memAddress|number)
 func ParseDoubleInstruction(parser *models.Parser) error {
-	pos := parser.Where()
 	h0 := parser.Get(0)
 	if h0 == nil {
 		return errors.New(string(models.ExpectedTokenErrLabel))
@@ -131,6 +123,6 @@ func ParseDoubleInstruction(parser *models.Parser) error {
 		return errors.New(string(models.ExpectedTokenErrLabel))
 	}
 
-	parser.Inject(models.NewDoubleInstructionStmt(h0.Kind, pos, *h1, *h2))
+	parser.Inject(models.NewDoubleInstructionStmt(h0.Kind, h0.Pos, *h1, *h2))
 	return nil
 }

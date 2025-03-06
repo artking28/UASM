@@ -10,8 +10,6 @@ type Parser struct {
 	tokens   []Token
 	output   Ast
 	cursor   int
-	column   int
-	line     int
 }
 
 func NewParser(filename string, tokens []Token) Parser {
@@ -51,17 +49,6 @@ func (this *Parser) Get(n int) *Token {
 func (this *Parser) Consume(n int) {
 	if this.cursor >= len(this.tokens) {
 		return
-	}
-	for i := 0; i < n; i++ {
-		tk := this.tokens[this.cursor+i]
-		if tk.Kind == TOKEN_BREAK_LINE {
-			this.column = 1
-			this.line += 1
-		}
-		this.column += len(tk.Value)
-		if tk.Kind == TOKEN_MEM {
-			this.column++
-		}
 	}
 	this.cursor += n
 }

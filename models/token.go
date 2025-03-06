@@ -43,11 +43,6 @@ func ResolveTokenId(token Token) Token {
 		if err == nil {
 			return NewToken(TOKEN_MEM, 1, rune(mem))
 		}
-	} else if count > 2 && (value[:2] == "0b" || value[:2] == "0o" || value[:2] == "0x") {
-		num, err := strconv.ParseInt(value[:count], 0, 64)
-		if err == nil {
-			return NewToken(TOKEN_NUMBER, 1, rune(num))
-		}
 	} else if strings.ToUpper(value) == ("GET") {
 		return NewToken(TOKEN_GET, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("SET") {
@@ -82,6 +77,11 @@ func ResolveTokenId(token Token) Token {
 		return NewToken(TOKEN_JNZ, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("HLT") {
 		return NewToken(TOKEN_HLT, 1, []rune(value)...)
+	} else {
+		num, err := strconv.ParseInt(value[:count], 0, 64)
+		if err == nil {
+			return NewToken(TOKEN_NUMBER, 1, rune(num))
+		}
 	}
 
 	return token

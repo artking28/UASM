@@ -68,3 +68,43 @@ func (this *Parser) Consume(n int) {
 	}
 	this.cursor += n
 }
+
+const (
+	NoSpaceMode = iota
+	OptionalSpaceMode
+	MandatorySpaceMode
+)
+
+func (this *Parser) HasNextConsume(spaceMode int, kinds ...TokenKindEnum) *Token {
+	for findSpace := false; ; {
+		token := this.Get(0)
+		if token == nil {
+			// Fim dos tokens sem encontrar um tipo esperado
+			return nil
+		}
+
+		for _, kind := range kinds {
+			if token.Kind == kind {
+				// Se espaços eram obrigatórios mas não foram encontrados, falha
+				if spaceMode == MandatorySpaceMode && !findSpace {
+					return nil
+				}
+				this.Consume(1)
+				return token
+			}
+		}
+
+		if token.Kind == TOKEN_SPACE {
+			findSpace = true
+			this.Consume(1)
+			continue
+		}
+
+		// Se espaços não eram permitidos ou eram obrigatórios e encontrou outro token, falha
+		if spaceMode == NoSpaceMode || spaceMode == MandatorySpaceMode {
+			return nil
+		}
+
+		return nil // Qualquer outro caso não esperado falha
+	}
+}

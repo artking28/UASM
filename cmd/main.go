@@ -10,8 +10,8 @@ import (
 )
 
 func main() {
-	InterpreterTest()
-	//AssemblerTest()
+	//InterpreterTest()
+	AssemblerTest()
 }
 
 func AssemblerTest() {
@@ -33,12 +33,11 @@ func AssemblerTest() {
 		log.Fatal(err.Error())
 	}
 
+	parser.Inspect()
 	//err = os.WriteFile(outputFile, parser.WriteProgram(), 0744)
 	//if err != nil {
 	//    log.Fatal(err.Error())
 	//}
-
-	parser.Inspect()
 }
 
 func InterpreterTest() {

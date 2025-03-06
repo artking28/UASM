@@ -1,6 +1,9 @@
 package models
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type (
 	Pos struct {
@@ -48,7 +51,7 @@ func (this Ast) Inspect() {
 		panic(err.Error())
 	}
 
-	println(string(str))
+	fmt.Printf("%s\n", string(str))
 }
 
 func NewCommentStmt(content string, pos Pos) CommentStmt {

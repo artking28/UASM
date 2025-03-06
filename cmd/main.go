@@ -27,7 +27,7 @@ func AssemblerTest() {
 	//    print(i, " ", tk.String())
 	//}
 
-	parser := models.NewParser(tokens)
+	parser := models.NewParser(inputFile, tokens)
 	err = compiler.ParseAll(&parser)
 	if err != nil {
 		log.Fatal(err.Error())

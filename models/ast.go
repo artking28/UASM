@@ -25,13 +25,24 @@ type (
 	}
 
 	CommentStmt struct {
-		StmtBase
 		Value string `json:"value"`
+		StmtBase
+	}
+
+	LabelDeclStmt struct {
+		LabelName string `json:"labelName"`
+		StmtBase
+	}
+
+	JumpStmt struct {
+		TargetLabelName string `json:"TargetLabelName"`
+		JumpKind        string `json:"jumpKind"`
+		StmtBase
 	}
 
 	PureInstructionStmt struct {
-		StmtBase
 		Code TokenKindEnum `json:"code"`
+		StmtBase
 	}
 
 	SingleInstructionStmt struct {
@@ -59,6 +70,27 @@ func NewCommentStmt(content string, pos Pos) CommentStmt {
 		Value: content,
 		StmtBase: StmtBase{
 			Title: "CommentStmt",
+			Pos:   pos,
+		},
+	}
+}
+
+func NewLabelDeclStmt(labelName string, pos Pos) LabelDeclStmt {
+	return LabelDeclStmt{
+		LabelName: labelName,
+		StmtBase: StmtBase{
+			Title: "LabelDeclStmt",
+			Pos:   pos,
+		},
+	}
+}
+
+func NewJumpStmt(targetLabelName, jumpKind string, pos Pos) JumpStmt {
+	return JumpStmt{
+		TargetLabelName: targetLabelName,
+		JumpKind:        jumpKind,
+		StmtBase: StmtBase{
+			Title: "JumpStmt",
 			Pos:   pos,
 		},
 	}
@@ -94,6 +126,17 @@ func NewDoubleInstructionStmt(code TokenKindEnum, pos Pos, left, right Token) Do
 
 func (this CommentStmt) WriteMemASM() []byte {
 	return []byte{}
+}
+
+func (this LabelDeclStmt) WriteMemASM() []byte {
+	//TODO implement me
+	panic("implement me")
+	return []byte{}
+}
+
+func (j JumpStmt) WriteMemASM() []byte {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (this PureInstructionStmt) WriteMemASM() []byte {

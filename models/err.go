@@ -80,19 +80,35 @@ func GetEmptyFileErr(filename string) Err {
 	}
 }
 
-func EexpectedTokenErr(filename string, line int) Err {
+func GetUnexpectedTokenNoPosErr(filename string, word string) Err {
 	return Err{
 		Code:  UnexpectedTokenErrCode,
 		Label: UnexpectedTokenErrLabel,
-		Msg:   fmt.Sprintf("Missing token in the %dº line of the file '%s'.", line, filename),
+		Msg:   fmt.Sprintf("Unexpected token '%s' in the file '%s'.", word, filename),
 	}
 }
 
-func GetUnexpectedTokenErr(filename string, char rune, line int) Err {
+func GetUnexpectedTokenErr(filename string, word string, pos Pos) Err {
 	return Err{
 		Code:  UnexpectedTokenErrCode,
 		Label: UnexpectedTokenErrLabel,
-		Msg:   fmt.Sprintf("Unexpected token '%s' in the %dº line of the file '%s'.", string(char), line, filename),
+		Msg:   fmt.Sprintf("Unexpected token '%s' in the file '%s' at line %d, column %d.", word, filename, pos.Line, pos.Column),
+	}
+}
+
+func GetExpectedSomeTokenErr(filename string, pos Pos) Err {
+	return Err{
+		Code:  UnexpectedTokenErrCode,
+		Label: UnexpectedTokenErrLabel,
+		Msg:   fmt.Sprintf("Missing some token in the file '%s' at line %d, column %d.", filename, pos.Line, pos.Column),
+	}
+}
+
+func GetExpectedTokenErr(filename string, phrase string, pos Pos) Err {
+	return Err{
+		Code:  UnexpectedTokenErrCode,
+		Label: UnexpectedTokenErrLabel,
+		Msg:   fmt.Sprintf("Missing %s in the file '%s' at line %d, column %d.", phrase, filename, pos.Line, pos.Column),
 	}
 }
 

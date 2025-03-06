@@ -5,18 +5,21 @@ import (
 )
 
 type Parser struct {
-	output Ast
-	tokens []Token
-	cursor int
-	column int
-	line   int
+	Filename string
+	labels   map[string]int
+	tokens   []Token
+	output   Ast
+	cursor   int
+	column   int
+	line     int
 }
 
-func NewParser(tokens []Token) Parser {
+func NewParser(filename string, tokens []Token) Parser {
 	return Parser{
-		output: Ast{},
-		tokens: tokens,
-		cursor: 0,
+		Filename: filename,
+		output:   Ast{},
+		tokens:   tokens,
+		cursor:   0,
 	}
 }
 

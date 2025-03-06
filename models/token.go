@@ -44,6 +44,8 @@ func ResolveTokenId(token Token) Token {
 		if err == nil {
 			return NewToken(token.Pos, TOKEN_MEM, 1, rune(mem))
 		}
+	} else if value[0] == '#' {
+		return NewToken(token.Pos, TOKEN_LABEL, 1, []rune(value[1:len(value)-1])...)
 	} else if strings.ToUpper(value) == ("GET") {
 		return NewToken(token.Pos, TOKEN_GET, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("SET") {
@@ -74,8 +76,10 @@ func ResolveTokenId(token Token) Token {
 		return NewToken(token.Pos, TOKEN_JMP, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("JIZ") {
 		return NewToken(token.Pos, TOKEN_JIZ, 1, []rune(value)...)
-	} else if strings.ToUpper(value) == ("JNZ") {
-		return NewToken(token.Pos, TOKEN_JNZ, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("JIN") {
+		return NewToken(token.Pos, TOKEN_JIN, 1, []rune(value)...)
+	} else if strings.ToUpper(value) == ("JIP") {
+		return NewToken(token.Pos, TOKEN_JIP, 1, []rune(value)...)
 	} else if strings.ToUpper(value) == ("HLT") {
 		return NewToken(token.Pos, TOKEN_HLT, 1, []rune(value)...)
 	} else {
@@ -101,7 +105,9 @@ const (
 	TOKEN_COMMA
 	TOKEN_COLON
 	TOKEN_MEM
+	TOKEN_LABEL
 	TOKEN_SLASH
+	TOKEN_HASHTAG
 	TOKEN_EOF
 
 	// #########################
@@ -130,13 +136,14 @@ const (
 	TOKEN_CMP
 	TOKEN_JMP
 	TOKEN_JIZ
-	TOKEN_JNZ
+	TOKEN_JIN
+	TOKEN_JIP
 
 	// Runtime actions
 	TOKEN_HLT
 )
 
-func (this Token) String() string {
+func (this Token) String(complete bool) string {
 	var s string
 	switch this.Kind {
 	case TOKEN_SPACE:
@@ -165,6 +172,9 @@ func (this Token) String() string {
 		break
 	case TOKEN_SLASH:
 		s = "TOKEN_SLASH"
+		break
+	case TOKEN_HASHTAG:
+		s = "TOKEN_HASHTAG"
 		break
 	case TOKEN_EOF:
 		s = "TOKEN_EOF"
@@ -214,23 +224,28 @@ func (this Token) String() string {
 	case TOKEN_JIZ:
 		s = "TOKEN_JIZ"
 		break
-	case TOKEN_JNZ:
-		s = "TOKEN_JNZ"
+	case TOKEN_JIN:
+		s = "TOKEN_JIN"
+		break
+	case TOKEN_JIP:
+		s = "TOKEN_JIP"
 		break
 	case TOKEN_HLT:
 		s = "TOKEN_HLT"
 		break
 	}
-	v := string(this.Value)
-	if this.Kind == TOKEN_BREAK_LINE {
-		v = "\\n"
-	} else if this.Kind == TOKEN_TAB {
-		v = "\\t"
-	} else if this.Kind == TOKEN_EOF {
-		v = "\\0"
-	} else if this.Kind == TOKEN_MEM || this.Kind == TOKEN_NUMBER {
-		v = strconv.Itoa(int(this.Value[0]))
+	if complete {
+		v := string(this.Value)
+		if this.Kind == TOKEN_BREAK_LINE {
+			v = "\\n"
+		} else if this.Kind == TOKEN_TAB {
+			v = "\\t"
+		} else if this.Kind == TOKEN_EOF {
+			v = "\\0"
+		} else if this.Kind == TOKEN_MEM || this.Kind == TOKEN_NUMBER {
+			v = strconv.Itoa(int(this.Value[0]))
+		}
+		return fmt.Sprintf("Token{%s, \"%s\", %.2d}", s, v, this.Repeat)
 	}
-	return fmt.Sprintf("Token{%s, \"%s\", %.2d}\n", s, v, this.Repeat)
-
+	return s
 }

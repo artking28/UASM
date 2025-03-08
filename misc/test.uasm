@@ -1,2 +1,4 @@
 inc
+dec
+add m10
 hlt

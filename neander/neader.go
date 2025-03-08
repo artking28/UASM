@@ -101,7 +101,7 @@ func RunProgram(program []byte, hexa, printFinalState bool) (Result, []byte) {
 	return result, program
 }
 
-func PrintProgram(program []byte, hexa, printTail bool) {
+func PrintProgram(program []byte, hexa, printTail, continueAfterHlt bool) {
 	padding := 4
 	fmt.Print("\nProgram:\n")
 	for i := padding; i < len(program); i += padding {
@@ -179,7 +179,9 @@ func PrintProgram(program []byte, hexa, printTail bool) {
 			break
 		case HLT:
 			fmt.Printf(" HLT\n")
-			i = len(program)
+			if !continueAfterHlt {
+				i = len(program)
+			}
 			break
 		default:
 			str := fmt.Sprintf(" %.3d\n", addr)

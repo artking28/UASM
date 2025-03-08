@@ -27,13 +27,12 @@ func (this *Parser) WriteProgram(forceSize bool) []uint8 {
 	// Prefixo do Neander.
 	constants := GetBuiltinConstants()
 	neanderPrefix := []uint16{1, 1}
-	jumpSize := uint16(0)
 	constantsCount := uint16(len(constants))
 	// O padding de constantes n pode ser impar
 	if constantsCount%2 == 1 {
 		constantsCount++
 	}
-	PaddingSize := uint16(len(neanderPrefix)) + jumpSize + constantsCount
+	PaddingSize := uint16(len(neanderPrefix)) + constantsCount
 
 	// Garante q o programa não vai tentar executar o espaço reservado para constantes
 	neanderPrefix = append(neanderPrefix, neander.JMP, PaddingSize)

@@ -2,10 +2,11 @@ package models
 
 import "UASM/neander"
 
-const NEANDER_PADDING = 4 // [padding](2 bytes) + [jump instruction +  addresss](2 byes)
+const NeanderPadding = 4   // 4 bytes
+const JmpConstantsSize = 2 // 2 bytes
 
 const (
-	OneValue uint16 = iota + NEANDER_PADDING
+	OneValue uint16 = iota + JmpConstantsSize
 	ZeroValue
 	MinusOneValue
 	AlternateOneValue
@@ -16,13 +17,13 @@ const (
 
 func GetBuiltinConstants() map[uint16]int16 {
 	return map[uint16]int16{
-		SiAddr:            0,
-		AcCache1Addr:      0,
-		AcCache0Addr:      0,
-		AlternateOneValue: 1,
-		MinusOneValue:     -1,
-		ZeroValue:         0,
-		OneValue:          1,
+		SiAddr + NeanderPadding - JmpConstantsSize:            0,
+		AcCache1Addr + NeanderPadding - JmpConstantsSize:      0,
+		AcCache0Addr + NeanderPadding - JmpConstantsSize:      0,
+		AlternateOneValue + NeanderPadding - JmpConstantsSize: 1,
+		MinusOneValue + NeanderPadding - JmpConstantsSize:     -1,
+		ZeroValue + NeanderPadding - JmpConstantsSize:         0,
+		OneValue + NeanderPadding - JmpConstantsSize:          1,
 	}
 }
 

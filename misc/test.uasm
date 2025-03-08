@@ -1,4 +1,9 @@
-inc
-dec
-add m10
-hlt
+inc // !ok
+not // !ok
+dec // !ok
+add m10 // !ok
+and m10 // !ok
+//set m10
+orr m10 // !ok
+neg // !ok
+hlt // !ok

@@ -4,7 +4,6 @@ import (
 	"UASM/neander"
 	"encoding/json"
 	"fmt"
-	mgu "github.com/artking28/myGoUtils"
 )
 
 type (
@@ -118,8 +117,7 @@ func NewSingleInstructionStmt(code TokenKindEnum, pos Pos, left Token) SingleIns
 }
 
 func (this SingleInstructionStmt) GetLeftASUint16() uint16 {
-	num, _ := mgu.Int[uint16](string(this.Left.Value[0]))
-	return num
+	return uint16(this.Left.Value[0])
 }
 
 func NewDoubleInstructionStmt(code TokenKindEnum, pos Pos, left, right Token) DoubleInstructionStmt {
@@ -132,8 +130,7 @@ func NewDoubleInstructionStmt(code TokenKindEnum, pos Pos, left, right Token) Do
 }
 
 func (this DoubleInstructionStmt) GetRightASUint16() uint16 {
-	num, _ := mgu.Int[uint16](string(this.Right.Value[0]))
-	return num
+	return uint16(this.Left.Value[0])
 }
 
 func (this CommentStmt) WriteMemASM() []uint16 {

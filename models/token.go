@@ -140,63 +140,64 @@ func AppendToken(tokens *[]Token, token Token) {
 	*tokens = append(*tokens, token)
 }
 
-func ResolveTokenId(token Token) Token {
+func ResolveTokenId(filename string, token Token) (Token, error) {
 	if token.Kind != TOKEN_ID {
-		return token
+		return token, nil
 	}
 	value := string(token.Value)
 	count := len(value)
 	if value[0] == 'm' {
 		mem, err := strconv.ParseInt(value[1:], 10, 64)
 		if err == nil {
-			return NewToken(token.Pos, TOKEN_MEM, 1, rune(mem))
+			return NewToken(token.Pos, TOKEN_MEM, 1, rune(mem)), nil
 		}
 	} else if value[0] == '#' {
-		return NewToken(token.Pos, TOKEN_LABEL, 1, []rune(value[1:len(value)-1])...)
+		return NewToken(token.Pos, TOKEN_LABEL, 1, []rune(value[1:len(value)-1])...), nil
 	} else if strings.ToUpper(value) == ("GET") {
-		return NewToken(token.Pos, TOKEN_GET, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_GET, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("SET") {
-		return NewToken(token.Pos, TOKEN_SET, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_SET, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("CPY") {
-		return NewToken(token.Pos, TOKEN_CPY, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_CPY, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("INC") {
-		return NewToken(token.Pos, TOKEN_INC, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_INC, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("DEC") {
-		return NewToken(token.Pos, TOKEN_DEC, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_DEC, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("NEG") {
-		return NewToken(token.Pos, TOKEN_NEG, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_NEG, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("NOT") {
-		return NewToken(token.Pos, TOKEN_NOT, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_NOT, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("ADD") {
-		return NewToken(token.Pos, TOKEN_ADD, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_ADD, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("MUL") {
-		return NewToken(token.Pos, TOKEN_MUL, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_MUL, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("AND") {
-		return NewToken(token.Pos, TOKEN_AND, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_AND, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("ORR") {
-		return NewToken(token.Pos, TOKEN_ORR, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_ORR, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("XOR") {
-		return NewToken(token.Pos, TOKEN_XOR, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_XOR, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("CMP") {
-		return NewToken(token.Pos, TOKEN_CMP, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_CMP, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("JMP") {
-		return NewToken(token.Pos, TOKEN_JMP, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_JMP, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("JIZ") {
-		return NewToken(token.Pos, TOKEN_JIZ, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_JIZ, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("JIN") {
-		return NewToken(token.Pos, TOKEN_JIN, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_JIN, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("JIP") {
-		return NewToken(token.Pos, TOKEN_JIP, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_JIP, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("HLT") {
-		return NewToken(token.Pos, TOKEN_HLT, 1, []rune(value)...)
+		return NewToken(token.Pos, TOKEN_HLT, 1, []rune(value)...), nil
 	} else {
 		num, err := strconv.ParseInt(value[:count], 0, 64)
 		if err == nil {
-			return NewToken(token.Pos, TOKEN_NUMBER, 1, rune(num))
+			return NewToken(token.Pos, TOKEN_NUMBER, 1, rune(num)), nil
 		}
+		return NewToken(token.Pos, TOKEN_NUMBER, 1, rune(num)), GetUnexpectedTokenErr(filename, string(token.Value), token.Pos)
 	}
 
-	return token
+	return token, nil
 }
 
 const (

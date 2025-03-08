@@ -33,7 +33,13 @@ func Tokenize(filename string) ([]models.Token, error) {
 			var tk models.Token
 			pos := models.Pos{Line: int64(line), Column: int64(column - buffer.Len())}
 			tk = models.NewToken(pos, models.TOKEN_ID, 1, []rune(buffer.String())...)
-			models.AppendToken(&ret, models.ResolveTokenId(tk))
+			if !isComment {
+				tk, err = models.ResolveTokenId(filename, tk)
+				if err != nil {
+					return nil, err
+				}
+			}
+			models.AppendToken(&ret, tk)
 			buffer.Reset()
 		}
 		switch run {

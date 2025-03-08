@@ -1,5 +1,10 @@
 package models
 
+import (
+	"UASM/neander"
+	mgu "github.com/artking28/myGoUtils"
+)
+
 type Parser struct {
 	Filename string
 	labels   map[string]int
@@ -17,14 +22,55 @@ func NewParser(filename string, tokens []Token) Parser {
 	}
 }
 
-func (this *Parser) WriteProgram() (ret []byte) {
-	//vec := mgu.VecMap(this.output.Statements, func(stmt Stmt) []uint16 {
-	//    return stmt.WriteMemASM()
-	//})
-	//for _, bytes := range vec {
-	//ret = append(ret, bytes...)
-	//}
-	return ret
+func (this *Parser) WriteProgram(forceSize bool) []uint8 {
+
+	// Prefixo do Neander.
+	constants := GetBuiltinConstants()
+	neanderPrefix := []uint16{1, 1}
+	jumpSize := uint16(0)
+	constantsCount := uint16(len(constants))
+	// O padding de constantes n pode ser impar
+	if constantsCount%2 == 1 {
+		constantsCount++
+	}
+	PaddingSize := uint16(len(neanderPrefix)) + jumpSize + constantsCount
+
+	// Garante q o programa não vai tentar executar o espaço reservado para constantes
+	neanderPrefix = append(neanderPrefix, neander.JMP, PaddingSize)
+	// Adiciona as constantes e os espaços de memória reversados.
+	neanderPrefix = append(neanderPrefix, make([]uint16, constantsCount)...)
+	for k, v := range constants {
+		neanderPrefix[k] = uint16(uint8(v))
+	}
+
+	// Transform os statements em bytecode e os reúne em 'program'.
+	vec := mgu.VecMap(this.output.Statements, func(stmt Stmt) []uint16 {
+		return stmt.WriteMemASM()
+	})
+	var program []uint16
+	for _, bytes := range vec {
+		program = append(program, bytes...)
+	}
+
+	// Reúne todas as partes.
+	neanderPrefix = append(neanderPrefix, program...)
+	final := make([]uint8, len(neanderPrefix)*2)
+	for i, num := range neanderPrefix {
+		final[i*2+1] = uint8(num >> 8)
+		final[i*2] = uint8(num)
+		//final[i*2] = uint8(num >> 8)
+		//final[i*2+1] = uint8(num)
+	}
+
+	// Marca o fim do programa
+	endAt := len(final)
+
+	// Itera pra ter 516 de tamanho
+	if endAt < 516 {
+		final = append(final, make([]uint8, 516-endAt)...)
+	}
+
+	return final
 }
 
 func (this *Parser) Inject(stmts ...Stmt) {

@@ -2,8 +2,10 @@ package models
 
 import "UASM/neander"
 
+const NEANDER_PADDING = 4 // [padding](2 bytes) + [jump instruction +  addresss](2 byes)
+
 const (
-	OneValue uint16 = 255 - iota
+	OneValue uint16 = iota + NEANDER_PADDING
 	ZeroValue
 	MinusOneValue
 	AlternateOneValue
@@ -12,15 +14,15 @@ const (
 	SiAddr
 )
 
-func GetBuiltinConstants() []uint16 {
-	return []uint16{
-		SiAddr,
-		AcCache1Addr,
-		AcCache0Addr,
-		AlternateOneValue,
-		MinusOneValue,
-		ZeroValue,
-		OneValue,
+func GetBuiltinConstants() map[uint16]int16 {
+	return map[uint16]int16{
+		SiAddr:            0,
+		AcCache1Addr:      0,
+		AcCache0Addr:      0,
+		AlternateOneValue: 1,
+		MinusOneValue:     -1,
+		ZeroValue:         0,
+		OneValue:          1,
 	}
 }
 

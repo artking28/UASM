@@ -12,7 +12,7 @@ func Tokenize(filename string) ([]models.Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(bytes) < 0 {
+	if len(bytes) <= 0 {
 		return nil, models.GetEmptyFileErr(filename)
 	}
 

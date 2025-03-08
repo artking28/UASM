@@ -4,41 +4,40 @@ import (
 	"UASM/compiler"
 	"UASM/models"
 	"UASM/neander"
-	"fmt"
 	"log"
 	"os"
 )
 
 func main() {
-	//InterpreterTest()
-	//AssemblerTest()
+	AssemblerTest()
+	InterpreterTest()
 
 	// pp ok
 	// np ok
 	// pn not ok
 	// nn not ok
-
-	ac := int8(-4)
-	adr := int8(-3)
-
-	// MUL adr
-	acCache0 := ac // 4
-	siAdr := adr   // 3
-	acCache1 := int8(0)
-	alternate := int8(-1)
-	if siAdr < 0 {
-		alternate = 1
-		siAdr = (^siAdr) + 1
-	}
-	for siAdr > 0 {
-		acCache1 += acCache0
-		siAdr += alternate
-	}
-	println(acCache1)
+	//
+	//ac := int8(-4)
+	//adr := int8(-3)
+	//
+	//// MUL adr
+	//acCache0 := ac // 4
+	//siAdr := adr   // 3
+	//acCache1 := int8(0)
+	//alternate := int8(-1)
+	//if siAdr < 0 {
+	//	alternate = 1
+	//	siAdr = (^siAdr) + 1
+	//}
+	//for siAdr > 0 {
+	//	acCache1 += acCache0
+	//	siAdr += alternate
+	//}
+	//println(acCache1)
 }
 
 func AssemblerTest() {
-	outputFile, inputFile := "output.mem", "misc/teste.uasm"
+	outputFile, inputFile := "misc/output.mem", "misc/test.uasm"
 	tokens, err := compiler.Tokenize(inputFile)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -57,19 +56,19 @@ func AssemblerTest() {
 	}
 
 	parser.Inspect()
-	//err = os.WriteFile(outputFile, parser.WriteProgram(), 0744)
-	//if err != nil {
-	//    log.Fatal(err.Error())
-	//}
-}
-
-func InterpreterTest() {
-	bytes, err := os.ReadFile("misc/TESTEHEREDIA.mem")
+	err = os.WriteFile(outputFile, []uint8(parser.WriteProgram(true)), 0744)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	//neander.PrintProgram(bytes, false, true)
+}
 
-	pr, _ := neander.RunProgram(bytes, false, true)
-	fmt.Printf("\nResult:\n\tAc = %x, Pc = %x, Z = %v, N = %v\n", pr.Ac, pr.Pc, pr.Ac == 0, int8(pr.Ac) < 0)
+func InterpreterTest() {
+	bytes, err := os.ReadFile("misc/output.mem")
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
+	neander.PrintProgram(bytes, false, true)
+
+	//pr, _ := neander.RunProgram(bytes, false, true)
+	//fmt.Printf("\n\nResult:\n\tAc = %x, Pc = %x, Z = %v, N = %v\n\n", pr.Ac, pr.Pc, pr.Ac == 0, int8(pr.Ac) < 0)
 }

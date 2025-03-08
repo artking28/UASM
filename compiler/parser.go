@@ -6,7 +6,7 @@ import (
 
 func ParseAll(parser *models.Parser) error {
 
-	models.StartHeap(128)
+	//models.StartHeap(128)
 	tk := parser.Get(0)
 	for ; tk != nil && tk.Kind != models.TOKEN_EOF; tk = parser.Get(0) {
 		switch tk.Kind {

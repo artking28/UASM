@@ -181,6 +181,13 @@ func PrintProgram(program []byte, hexa, printTail bool) {
 			fmt.Printf(" HLT\n")
 			i = len(program)
 			break
+		default:
+			str := fmt.Sprintf(" %.3d\n", addr)
+			if hexa {
+				str = fmt.Sprintf(" 0x%.2x\n", addr)
+			}
+			i -= 2
+			fmt.Print(str)
 		}
 	}
 

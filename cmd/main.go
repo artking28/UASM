@@ -11,7 +11,30 @@ import (
 
 func main() {
 	//InterpreterTest()
-	AssemblerTest()
+	//AssemblerTest()
+
+	// pp ok
+	// np ok
+	// pn not ok
+	// nn not ok
+
+	ac := int8(-4)
+	adr := int8(-3)
+
+	// MUL adr
+	acCache0 := ac // 4
+	siAdr := adr   // 3
+	acCache1 := int8(0)
+	alternate := int8(-1)
+	if siAdr < 0 {
+		alternate = 1
+		siAdr = (^siAdr) + 1
+	}
+	for siAdr > 0 {
+		acCache1 += acCache0
+		siAdr += alternate
+	}
+	println(acCache1)
 }
 
 func AssemblerTest() {

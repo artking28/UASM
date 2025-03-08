@@ -1,8 +1,10 @@
 package models
 
 import (
+	"UASM/neander"
 	"encoding/json"
 	"fmt"
+	mgu "github.com/artking28/myGoUtils"
 )
 
 type (
@@ -16,7 +18,7 @@ type (
 	}
 
 	Stmt interface {
-		WriteMemASM() []byte
+		WriteMemASM() []uint16
 	}
 
 	StmtBase struct {
@@ -115,6 +117,11 @@ func NewSingleInstructionStmt(code TokenKindEnum, pos Pos, left Token) SingleIns
 	return s
 }
 
+func (this SingleInstructionStmt) GetLeftASUint16() uint16 {
+	num, _ := mgu.Int[uint16](string(this.Left.Value[0]))
+	return num
+}
+
 func NewDoubleInstructionStmt(code TokenKindEnum, pos Pos, left, right Token) DoubleInstructionStmt {
 	d := DoubleInstructionStmt{
 		SingleInstructionStmt: NewSingleInstructionStmt(code, pos, left),
@@ -124,35 +131,92 @@ func NewDoubleInstructionStmt(code TokenKindEnum, pos Pos, left, right Token) Do
 	return d
 }
 
-func (this CommentStmt) WriteMemASM() []byte {
-	return []byte{}
+func (this DoubleInstructionStmt) GetRightASUint16() uint16 {
+	num, _ := mgu.Int[uint16](string(this.Right.Value[0]))
+	return num
 }
 
-func (this LabelDeclStmt) WriteMemASM() []byte {
-	//TODO implement me
-	panic("implement me")
-	return []byte{}
+func (this CommentStmt) WriteMemASM() []uint16 {
+	return []uint16{}
 }
 
-func (j JumpStmt) WriteMemASM() []byte {
+func (this LabelDeclStmt) WriteMemASM() []uint16 {
 	//TODO implement me
-	panic("implement me")
+	panic("implement me LabelDeclStmt WriteMemASM")
+	return []uint16{}
 }
 
-func (this PureInstructionStmt) WriteMemASM() []byte {
+func (this JumpStmt) WriteMemASM() []uint16 {
 	//TODO implement me
-	panic("implement me")
-	return []byte{}
+	panic("implement me JumpStmt WriteMemASM")
+	return []uint16{}
 }
 
-func (this SingleInstructionStmt) WriteMemASM() []byte {
-	//TODO implement me
-	panic("implement me")
-	return []byte{}
+func (this PureInstructionStmt) WriteMemASM() (ret []uint16) {
+	switch this.Code {
+	case TOKEN_INC:
+		ret = append(ret, neander.ADD, OneValue)
+		break
+	case TOKEN_DEC:
+		ret = append(ret, neander.ADD, MinusOneValue)
+		break
+	case TOKEN_NEG:
+		ret = append(ret, neander.NOT, neander.ADD, OneValue)
+		break
+	case TOKEN_NOT:
+		ret = append(ret, neander.NOT)
+		break
+	case TOKEN_HLT:
+		ret = append(ret, neander.HLT)
+		break
+	default:
+		//TODO implement me
+		panic("implement me switch default branch in PureInstructionStmt WriteMemASM implementation")
+	}
+	return ret
 }
 
-func (this DoubleInstructionStmt) WriteMemASM() []byte {
+func (this SingleInstructionStmt) WriteMemASM() (ret []uint16) {
+	switch this.Code {
+	case TOKEN_GET:
+		if this.Left.Kind == TOKEN_NUMBER {
+			ret = append(ret, neander.LDA, this.GetLeftASUint16())
+			break
+		}
+		ret = append(ret, neander.LDA, this.GetLeftASUint16())
+		break
+	case TOKEN_SET:
+		//TODO implement me
+		panic("implement me, TOKEN_SET materialize")
+		break
+	case TOKEN_MUL:
+		leftArg := this.GetLeftASUint16()
+		ret = append(ret, GetBuiltinMulFunc(uint16(len(ret)), leftArg)...)
+		break
+	case TOKEN_ADD:
+		ret = append(ret, neander.ADD, this.GetLeftASUint16())
+		break
+	case TOKEN_AND:
+		ret = append(ret, neander.AND, this.GetLeftASUint16())
+		break
+	case TOKEN_ORR:
+		ret = append(ret, neander.OR, this.GetLeftASUint16())
+		break
+	case TOKEN_XOR:
+		//ret = append(ret, neander.XOR, this.GetLeftASUint16())
+		break
+	case TOKEN_CMP:
+		//TODO implement me
+		panic("implement me, TOKEN_CMP materialize")
+	default:
+		//TODO implement me
+		panic("implement me switch default branch in PureInstructionStmt WriteMemASM implementation")
+	}
+	return ret
+}
+
+func (this DoubleInstructionStmt) WriteMemASM() (ret []uint16) {
 	//TODO implement me
 	panic("implement me")
-	return []byte{}
+	return ret
 }

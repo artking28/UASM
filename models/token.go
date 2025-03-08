@@ -21,6 +21,113 @@ func NewToken(pos Pos, kind TokenKindEnum, repeat int, value ...rune) Token {
 	return Token{pos, kind, value, repeat}
 }
 
+func (this Token) String(complete bool) string {
+	var s string
+	switch this.Kind {
+	case TOKEN_SPACE:
+		s = "TOKEN_SPACE"
+		break
+	case TOKEN_BREAK_LINE:
+		s = "TOKEN_BREAK_LINE"
+		break
+	case TOKEN_TAB:
+		s = "TOKEN_TAB"
+		break
+	case TOKEN_ID:
+		s = "TOKEN_ID"
+		break
+	case TOKEN_NUMBER:
+		s = "TOKEN_NUMBER"
+		break
+	case TOKEN_COMMA:
+		s = "TOKEN_COMMA"
+		break
+	case TOKEN_COLON:
+		s = "TOKEN_COLON"
+		break
+	case TOKEN_MEM:
+		s = "TOKEN_MEM"
+		break
+	case TOKEN_SLASH:
+		s = "TOKEN_SLASH"
+		break
+	case TOKEN_HASHTAG:
+		s = "TOKEN_HASHTAG"
+		break
+	case TOKEN_EOF:
+		s = "TOKEN_EOF"
+		break
+	case TOKEN_GET:
+		s = "TOKEN_GET"
+		break
+	case TOKEN_SET:
+		s = "TOKEN_SET"
+		break
+	case TOKEN_CPY:
+		s = "TOKEN_CPY"
+		break
+	case TOKEN_INC:
+		s = "TOKEN_INC"
+		break
+	case TOKEN_DEC:
+		s = "TOKEN_DEC"
+		break
+	case TOKEN_NEG:
+		s = "TOKEN_NEG"
+		break
+	case TOKEN_NOT:
+		s = "TOKEN_NOT"
+		break
+	case TOKEN_ADD:
+		s = "TOKEN_ADD"
+		break
+	case TOKEN_MUL:
+		s = "TOKEN_MUL"
+		break
+	case TOKEN_AND:
+		s = "TOKEN_AND"
+		break
+	case TOKEN_ORR:
+		s = "TOKEN_ORR"
+		break
+	case TOKEN_XOR:
+		s = "TOKEN_XOR"
+		break
+	case TOKEN_CMP:
+		s = "TOKEN_CMP"
+		break
+	case TOKEN_JMP:
+		s = "TOKEN_JMP"
+		break
+	case TOKEN_JIZ:
+		s = "TOKEN_JIZ"
+		break
+	case TOKEN_JIN:
+		s = "TOKEN_JIN"
+		break
+	case TOKEN_JIP:
+		s = "TOKEN_JIP"
+		break
+	case TOKEN_HLT:
+		s = "TOKEN_HLT"
+		break
+	}
+	if complete {
+		v := string(this.Value)
+		if this.Kind == TOKEN_BREAK_LINE {
+			v = "\\n"
+		} else if this.Kind == TOKEN_TAB {
+			v = "\\t"
+		} else if this.Kind == TOKEN_EOF {
+			v = "\\0"
+		} else if this.Kind == TOKEN_MEM || this.Kind == TOKEN_NUMBER {
+			v = strconv.Itoa(int(this.Value[0]))
+		}
+		return fmt.Sprintf("Token{%s, \"%s\", %.2d}", s, v, this.Repeat)
+	}
+	return s
+}
+
 func AppendToken(tokens *[]Token, token Token) {
 	if tokens == nil {
 		tokens = &[]Token{}
@@ -142,110 +249,3 @@ const (
 	// Runtime actions
 	TOKEN_HLT
 )
-
-func (this Token) String(complete bool) string {
-	var s string
-	switch this.Kind {
-	case TOKEN_SPACE:
-		s = "TOKEN_SPACE"
-		break
-	case TOKEN_BREAK_LINE:
-		s = "TOKEN_BREAK_LINE"
-		break
-	case TOKEN_TAB:
-		s = "TOKEN_TAB"
-		break
-	case TOKEN_ID:
-		s = "TOKEN_ID"
-		break
-	case TOKEN_NUMBER:
-		s = "TOKEN_NUMBER"
-		break
-	case TOKEN_COMMA:
-		s = "TOKEN_COMMA"
-		break
-	case TOKEN_COLON:
-		s = "TOKEN_COLON"
-		break
-	case TOKEN_MEM:
-		s = "TOKEN_MEM"
-		break
-	case TOKEN_SLASH:
-		s = "TOKEN_SLASH"
-		break
-	case TOKEN_HASHTAG:
-		s = "TOKEN_HASHTAG"
-		break
-	case TOKEN_EOF:
-		s = "TOKEN_EOF"
-		break
-	case TOKEN_GET:
-		s = "TOKEN_GET"
-		break
-	case TOKEN_SET:
-		s = "TOKEN_SET"
-		break
-	case TOKEN_CPY:
-		s = "TOKEN_CPY"
-		break
-	case TOKEN_INC:
-		s = "TOKEN_INC"
-		break
-	case TOKEN_DEC:
-		s = "TOKEN_DEC"
-		break
-	case TOKEN_NEG:
-		s = "TOKEN_NEG"
-		break
-	case TOKEN_NOT:
-		s = "TOKEN_NOT"
-		break
-	case TOKEN_ADD:
-		s = "TOKEN_ADD"
-		break
-	case TOKEN_MUL:
-		s = "TOKEN_MUL"
-		break
-	case TOKEN_AND:
-		s = "TOKEN_AND"
-		break
-	case TOKEN_ORR:
-		s = "TOKEN_ORR"
-		break
-	case TOKEN_XOR:
-		s = "TOKEN_XOR"
-		break
-	case TOKEN_CMP:
-		s = "TOKEN_CMP"
-		break
-	case TOKEN_JMP:
-		s = "TOKEN_JMP"
-		break
-	case TOKEN_JIZ:
-		s = "TOKEN_JIZ"
-		break
-	case TOKEN_JIN:
-		s = "TOKEN_JIN"
-		break
-	case TOKEN_JIP:
-		s = "TOKEN_JIP"
-		break
-	case TOKEN_HLT:
-		s = "TOKEN_HLT"
-		break
-	}
-	if complete {
-		v := string(this.Value)
-		if this.Kind == TOKEN_BREAK_LINE {
-			v = "\\n"
-		} else if this.Kind == TOKEN_TAB {
-			v = "\\t"
-		} else if this.Kind == TOKEN_EOF {
-			v = "\\0"
-		} else if this.Kind == TOKEN_MEM || this.Kind == TOKEN_NUMBER {
-			v = strconv.Itoa(int(this.Value[0]))
-		}
-		return fmt.Sprintf("Token{%s, \"%s\", %.2d}", s, v, this.Repeat)
-	}
-	return s
-}

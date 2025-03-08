@@ -6,6 +6,7 @@ import (
 
 func ParseAll(parser *models.Parser) error {
 
+	models.StartHeap(128)
 	tk := parser.Get(0)
 	for ; tk != nil && tk.Kind != models.TOKEN_EOF; tk = parser.Get(0) {
 		switch tk.Kind {
@@ -97,9 +98,6 @@ func ParseJumpInstruction(parser *models.Parser) error {
 	if h0 == nil {
 		return models.GetUnexpectedTokenNoPosErr(parser.Filename, "EOF")
 	}
-	if h0.Kind != models.TOKEN_JMP && h0.Kind != models.TOKEN_JIZ && h0.Kind != models.TOKEN_JIN && h0.Kind != models.TOKEN_JIP {
-		return models.GetUnexpectedTokenErr(parser.Filename, string(h0.Value), h0.Pos)
-	}
 	parser.Consume(1)
 	if parser.HasNextConsume(models.MandatorySpaceMode, models.TOKEN_HASHTAG) == nil {
 		return models.GetExpectedTokenErr(parser.Filename, "label", h0.Pos)
@@ -118,45 +116,29 @@ func ParsePureInstruction(parser *models.Parser) error {
 	if h0 == nil {
 		return models.GetUnexpectedTokenNoPosErr(parser.Filename, "EOF")
 	}
-	switch h0.Kind {
-	case models.TOKEN_INC, models.TOKEN_DEC, models.TOKEN_NEG, models.TOKEN_NOT, models.TOKEN_HLT:
-		parser.Inject(models.NewPureInstructionStmt(h0.Kind, h0.Pos))
-		parser.Consume(1)
-		break
-	default:
-		return models.GetUnexpectedTokenErr(parser.Filename, string(h0.Value), h0.Pos)
-	}
+	parser.Inject(models.NewPureInstructionStmt(h0.Kind, h0.Pos))
+	parser.Consume(1)
 	return nil
 }
 
 func ParseSingleInstruction(parser *models.Parser) error {
-	h0, h1 := parser.Get(0), parser.Get(2)
+	h0 := parser.Get(0)
 	if h0 == nil {
 		return models.GetUnexpectedTokenNoPosErr(parser.Filename, "EOF")
 	}
-	if h1 == nil {
-		//TODO implement me
-		panic("implement me(function compiler.ParseSingleInstruction)")
+	parser.Consume(1)
+	var h1 *models.Token
+	phrase := "memory address"
+	if h0.Kind == models.TOKEN_GET {
+		h1 = parser.HasNextConsume(models.MandatorySpaceMode, models.TOKEN_MEM, models.TOKEN_NUMBER)
+		phrase += " or number literal"
+	} else {
+		h1 = parser.HasNextConsume(models.MandatorySpaceMode, models.TOKEN_MEM)
 	}
-	switch h0.Kind {
-	case models.TOKEN_GET:
-		if h1.Kind != models.TOKEN_MEM && h1.Kind != models.TOKEN_NUMBER {
-			return models.GetUnexpectedTokenErr(parser.Filename, string(h1.Value), h0.Pos)
-		}
-		break
-	case models.TOKEN_SET, models.TOKEN_ADD, models.TOKEN_MUL,
-		models.TOKEN_AND, models.TOKEN_ORR, models.TOKEN_XOR,
-		models.TOKEN_CMP, models.TOKEN_JMP, models.TOKEN_JIZ,
-		models.TOKEN_JIP, models.TOKEN_JIN:
-		if h1.Kind != models.TOKEN_MEM {
-			return models.GetUnexpectedTokenErr(parser.Filename, string(h1.Value), h0.Pos)
-		}
-		break
-	default:
-		return models.GetUnexpectedTokenErr(parser.Filename, string(h0.Value), h0.Pos)
+	if h1 == nil {
+		return models.GetExpectedTokenErr(parser.Filename, phrase, h0.Pos)
 	}
 	parser.Inject(models.NewSingleInstructionStmt(h0.Kind, h0.Pos, *h1))
-	parser.Consume(2)
 	return nil
 }
 
@@ -166,11 +148,8 @@ func ParseDoubleInstruction(parser *models.Parser) error {
 	if h0 == nil {
 		return models.GetUnexpectedTokenNoPosErr(parser.Filename, "EOF")
 	}
-	if h0.Kind != models.TOKEN_CPY {
-		return models.GetUnexpectedTokenErr(parser.Filename, string(h0.Value), h0.Pos)
-	}
 	parser.Consume(1)
-	h1 := parser.HasNextConsume(models.OptionalSpaceMode, models.TOKEN_MEM)
+	h1 := parser.HasNextConsume(models.MandatorySpaceMode, models.TOKEN_MEM)
 	if h1 == nil {
 		return models.GetExpectedTokenErr(parser.Filename, "memory address", h0.Pos)
 	}

@@ -1,9 +1,5 @@
 package models
 
-import (
-	mgu "github.com/artking28/myGoUtils"
-)
-
 type Parser struct {
 	Filename string
 	labels   map[string]int
@@ -22,12 +18,12 @@ func NewParser(filename string, tokens []Token) Parser {
 }
 
 func (this *Parser) WriteProgram() (ret []byte) {
-	vec := mgu.VecMap(this.output.Statements, func(stmt Stmt) []byte {
-		return stmt.WriteMemASM()
-	})
-	for _, bytes := range vec {
-		ret = append(ret, bytes...)
-	}
+	//vec := mgu.VecMap(this.output.Statements, func(stmt Stmt) []uint16 {
+	//    return stmt.WriteMemASM()
+	//})
+	//for _, bytes := range vec {
+	//ret = append(ret, bytes...)
+	//}
 	return ret
 }
 
@@ -60,6 +56,9 @@ const (
 )
 
 func (this *Parser) HasNextConsume(spaceMode int, kinds ...TokenKindEnum) *Token {
+	if spaceMode < NoSpaceMode || spaceMode > MandatorySpaceMode {
+		panic("invalid argument in function 'HasNextConsume'")
+	}
 	for findSpace := false; ; {
 		token := this.Get(0)
 		if token == nil {

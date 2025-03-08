@@ -3,7 +3,7 @@ not // !ok
 dec // !ok
 add m10 // !ok
 and m10 // !ok
-//set m10
+set m10 // !ok
 orr m10 // !ok
 neg // !ok
 hlt // !ok

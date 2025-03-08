@@ -183,8 +183,7 @@ func (this SingleInstructionStmt) WriteMemASM() (ret []uint16) {
 		ret = append(ret, neander.LDA, this.GetLeftASUint16())
 		break
 	case TOKEN_SET:
-		//TODO implement me
-		panic("implement me, TOKEN_SET materialize")
+		ret = append(ret, neander.LDA, this.GetLeftASUint16())
 		break
 	case TOKEN_MUL:
 		leftArg := this.GetLeftASUint16()

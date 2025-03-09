@@ -2,6 +2,19 @@
 #### Por: Arthur Andrade
 Este documento especifica detalhes de uso da linguagem UASM(Esse nome foi gerado por uma IA geradora de nomes)
 
+## Compilar
+Para rodar o arquivo UASM, basta fazer a build do executavel com `go build -o uasm cmd/main.go`.
+Após ter o executável, escreva seu progrmaa UASM e chame o executabel passando o nome do arquivo como primeiro argumento.
+Exemplo:
+```
+./uasm program.uasm 
+```
+
+O outputa sairá no mesmo diretório do input, mas você pode ainda especificar o ponto de saida do arquivo como no exemplo abaixo.
+```
+./uasm program.uasm program.mem
+```
+
 ## Números
 Literais de números podem ser escritos de quatro formas diferentes desde que sigam seus prefixos. Sendo elas binários, decimais, octais e hexadecimais.
 Segue o exemplo abaixo do número onze:

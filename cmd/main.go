@@ -4,51 +4,36 @@ import (
 	"UASM/compiler"
 	"UASM/models"
 	"UASM/neander"
+	"errors"
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 func main() {
-	AssemblerTest()
-	InterpreterTest()
 
-	// pp ok
-	// np ok
-	// pn not ok
-	// nn not ok
-	//
-	//ac := int8(-4)
-	//adr := int8(-3)
-	//
-	//// MUL adr
-	//acCache0 := ac // 4
-	//siAdr := adr   // 3
-	//acCache1 := int8(0)
-	//alternate := int8(-1)
-	//if siAdr < 0 {
-	//	alternate = 1
-	//	siAdr = (^siAdr) + 1
-	//}
-	//for siAdr > 0 {
-	//	acCache1 += acCache0
-	//	siAdr += alternate
-	//}
-	//println(acCache1)
-}
+	count := len(os.Args)
+	if count < 2 || count > 3 {
+		log.Fatal(errors.New("error: inválid arguments"))
+	}
 
-func AssemblerTest() {
-	outputFile, inputFile := "misc/output.mem", "misc/test.uasm"
+	inputFile := os.Args[1]
+	if !strings.HasSuffix(inputFile, ".uasm") {
+		log.Fatal(errors.New("error: this is not a UASM file. Please, rename it before compiling"))
+	}
+
+	outputFile := strings.Split(inputFile, ".uasm")[0] + ".mem"
+	if count == 3 {
+		outputFile = os.Args[2]
+		if !strings.HasSuffix(outputFile, ".mem") {
+			log.Fatal(errors.New("error: this is not a MEM output file. Please, choose another name to output file"))
+		}
+	}
 	tokens, err := compiler.Tokenize(inputFile)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-
-	_ = outputFile
-	//fmt.Printf("Ok! %d tokens found.\n", len(tokens))
-	//for i, tk := range tokens {
-	//    print(i, " ", tk.String())
-	//}
 
 	parser := models.NewParser(inputFile, tokens)
 	err = compiler.ParseAll(&parser)

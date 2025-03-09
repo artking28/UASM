@@ -225,7 +225,7 @@ func (this SingleInstructionStmt) WriteMemASM() (ret []uint16) {
 		ret = append(ret, neander.LDA, this.GetLeftASUint16())
 		break
 	case TOKEN_SET:
-		ret = append(ret, neander.LDA, this.GetLeftASUint16())
+		ret = append(ret, neander.STA, this.GetLeftASUint16())
 		break
 	case TOKEN_MUL:
 		leftArg := this.GetLeftASUint16()

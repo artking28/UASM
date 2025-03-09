@@ -4,6 +4,7 @@ import (
 	"UASM/compiler"
 	"UASM/models"
 	"UASM/neander"
+	"fmt"
 	"log"
 	"os"
 )
@@ -69,6 +70,6 @@ func InterpreterTest() {
 	}
 	neander.PrintProgram(bytes, false, false, false)
 
-	//pr, _ := neander.RunProgram(bytes, false, true)
-	//fmt.Printf("\n\nResult:\n\tAc = %x, Pc = %x, Z = %v, N = %v\n\n", pr.Ac, pr.Pc, pr.Ac == 0, int8(pr.Ac) < 0)
+	pr, _ := neander.RunProgram(bytes, false, false)
+	fmt.Printf("\n\nResult:\n\tAc = %d, Pc = %d, Z = %v, N = %v\n\n", (pr.Ac), pr.Pc, pr.Ac == 0, int8(pr.Ac) < 0)
 }

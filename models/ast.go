@@ -242,7 +242,13 @@ func (this SingleInstructionStmt) WriteMemASM() (ret []uint16) {
 		ret = append(ret, neander.OR, this.GetLeftASUint16())
 		break
 	case TOKEN_XOR:
-		//ret = append(ret, neander.XOR, this.GetLeftASUint16())
+		ret = append(ret, neander.STA, AcCache1Addr)
+		ret = append(ret, neander.OR, this.GetLeftASUint16())
+		ret = append(ret, neander.STA, AcCache0Addr)
+		ret = append(ret, neander.LDA, AcCache1Addr)
+		ret = append(ret, neander.AND, this.GetLeftASUint16())
+		ret = append(ret, neander.NOT)
+		ret = append(ret, neander.AND, AcCache0Addr)
 		break
 	case TOKEN_SUB:
 		ret = append(ret, neander.STA, AcCache0Addr)

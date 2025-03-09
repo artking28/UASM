@@ -1,4 +1,4 @@
-cpy m90, 3
-get 2
-add m90
+get 7
+cpy m89, 2
+xor m89
 hlt

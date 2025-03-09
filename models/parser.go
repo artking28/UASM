@@ -46,39 +46,47 @@ func (this *Parser) AllocNum(num int16) uint16 {
 
 func (this *Parser) WriteProgram() []uint8 {
 
-	var vec [][]uint16
-	var stmtSizes int
-	resolveLabel := map[int]string{}
+	var vec [][]uint16               // Guarda os bytes de cada statement
+	var stmtSizes int                // Tamanho em tempo real do programa
+	resolveLabel := map[int]string{} // Labels que devem ter posições recalculadas após a definição do heap
 	for _, stmt := range this.output.Statements {
+
+		// Se for um statement de label, adiciona nos bytecode labels
 		if stmt.GetTitle() == "LabelDeclStmt" {
 			labelStmt := stmt.(LabelDeclStmt)
 			this.ByteCodeLabels[labelStmt.LabelName] = uint16(stmtSizes)
 		}
+
+		// Transforma o statement em bytecode
 		bytes := stmt.WriteMemASM()
+
+		// Se for um jump, marca a label como pendencia de recalculo de posição
 		if stmt.GetTitle() == "JumpStmt" {
 			jmpStmt := stmt.(JumpStmt)
 			resolveLabel[stmtSizes+len(bytes)-1] = jmpStmt.TargetLabelName
 		}
+
 		stmtSizes += len(bytes)
 		vec = append(vec, bytes)
 	}
+
+	// Gera o array real do programa
 	var program []uint16
 	for _, bytes := range vec {
 		program = append(program, bytes...)
 	}
 
-	// Prefixo do Neander.
-	//constants := GetBuiltinConstants()
-	constants := this.memHep.content
+	constants := this.memHep.content // Constantes do programa
 	constantsCount := uint16(len(constants))
-	neanderPrefix := []uint16{1, 1}
-	// O padding de constantes n pode ser impar
+	neanderPrefix := []uint16{1, 1} // Prefixo de 2 bytes de todos os programas neander
 	PaddingSize := uint16(len(neanderPrefix)) + constantsCount
 
+	// Recalcula a posicao das labels
 	for k := range this.ByteCodeLabels {
 		this.ByteCodeLabels[k] += PaddingSize
 	}
 
+	// Aplica as novas posicoes das labels nos lugares onde elas foram chamadas
 	for k, v := range resolveLabel {
 		program[k] = this.ByteCodeLabels[v]
 	}
@@ -91,14 +99,12 @@ func (this *Parser) WriteProgram() []uint8 {
 		neanderPrefix[k] = uint16(uint8(v))
 	}
 
-	// Reúne todas as partes.
+	// Transforma tudo em uint16
 	neanderPrefix = append(neanderPrefix, program...)
 	final := make([]uint8, len(neanderPrefix)*2)
 	for i, num := range neanderPrefix {
 		final[i*2+1] = uint8(num >> 8)
 		final[i*2] = uint8(num)
-		//final[i*2] = uint8(num >> 8)
-		//final[i*2+1] = uint8(num)
 	}
 
 	// Marca o fim do programa

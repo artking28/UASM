@@ -102,14 +102,6 @@ um numero nem um underline. Segue a criação de quatro labels abaixo:
   ```asm
   ADD m1 // Adiciona o conteúdo de m1 no acumulador
 
-### 9. `MUL` - **Multiplicative**
-- Multiplica o valor do acumulador pelo valor de um endereço de memória.
-- **Format**: `MUL <MEMORY_ADDRESS>`
-- **Exemplo de uso**:
-
-  ```asm
-  MUL m1 // Multiplica o conteudo de m1 no acumulador
-
 ### 10. `AND` - **AND**
 - Aplica a operação lógica AND entre o acumulador e o valor de um endereço de memória.
 - **Format**: `AND <MEMORY_ADDRESS>`
@@ -118,13 +110,13 @@ um numero nem um underline. Segue a criação de quatro labels abaixo:
   ```asm
   AND m1 // Aplica a operação 'and' entre o conteúdo de m1 e o acumulador. Salva no acumulador
 
-### 11. `ORR` - **ORR**
+### 11. `OR` - **OR**
 - Aplica a operação lógica OR entre o acumulador e o valor de um endereço de memória.
-- **Format**: `ORR <MEMORY_ADDRESS>`
+- **Format**: `OR <MEMORY_ADDRESS>`
 - **Exemplo de uso**:
 
   ```asm
-  ORR m1 // Aplica a operação 'or' entre o conteudo de m1 e o acumulador. Salva no acumulador
+  OR m1 // Aplica a operação 'or' entre o conteudo de m1 e o acumulador. Salva no acumulador
 
 ### 12. `XOR` - **XOR**
 - Aplica a operação lógica XOR entre o acumulador e o valor de um endereço de memória.
@@ -170,17 +162,8 @@ um numero nem um underline. Segue a criação de quatro labels abaixo:
   #here:
     JIN #here // Cria um loop infinito se houver um valor negativo no acumulador.
 
-### 17. `JIP` - **Jump if positive**
-- Faz o salto para a 'label' especificado se o acumulador for positivo.
-- **Format**: `JIP <LABEL>`
-- **Exemplo de uso**:
-
-  ```asm
-  #here:
-    JIP #here // Cria um loop infinito se houver um valor positivo no acumulador.
-
 ## Runtime actions
-### 18. `HLT` - **Halt**
+### 19. `HLT` - **Halt**
 - Interrompe a execução do programa.
 - **Exemplo de uso**:
 

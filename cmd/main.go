@@ -56,8 +56,13 @@ func AssemblerTest() {
 		log.Fatal(err.Error())
 	}
 
+	content, err := parser.WriteProgram()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	//parser.Inspect()
-	err = os.WriteFile(outputFile, parser.WriteProgram(), 0744)
+	err = os.WriteFile(outputFile, content, 0744)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -71,5 +76,5 @@ func InterpreterTest() {
 	neander.PrintProgram(bytes, false, false, false)
 
 	pr, _ := neander.RunProgram(bytes, false, false)
-	fmt.Printf("\n\nResult:\n\tAc = %d, Pc = %d, Z = %v, N = %v\n\n", (pr.Ac), pr.Pc, pr.Ac == 0, int8(pr.Ac) < 0)
+	fmt.Printf("\n\nResult:\n\tAc = %d, Pc = %d, Z = %v, N = %v\n\n", int8(pr.Ac), pr.Pc, pr.Ac == 0, int8(pr.Ac) < 0)
 }

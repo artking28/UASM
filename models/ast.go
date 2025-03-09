@@ -17,7 +17,7 @@ type (
 	}
 
 	Stmt interface {
-		WriteMemASM() []uint16
+		WriteMemASM() ([]uint16, error)
 		GetTitle() string
 	}
 
@@ -163,35 +163,33 @@ func (this DoubleInstructionStmt) GetTitle() string {
 	return this.Title
 }
 
-func (this CommentStmt) WriteMemASM() []uint16 {
-	return []uint16{}
+func (this CommentStmt) WriteMemASM() (ret []uint16, err error) {
+	return []uint16{}, nil
 }
 
-func (this LabelDeclStmt) WriteMemASM() []uint16 {
-	return []uint16{}
+func (this LabelDeclStmt) WriteMemASM() (ret []uint16, err error) {
+	return []uint16{}, nil
 }
 
-func (this JumpStmt) WriteMemASM() (ret []uint16) {
+func (this JumpStmt) WriteMemASM() (ret []uint16, err error) {
 	switch this.JumpKind {
 	case TOKEN_JMP:
-		ret = append(ret, neander.JMP, this.Parser.ByteCodeLabels[this.TargetLabelName])
+		ret = append(ret, neander.JMP, this.Parser.labels[this.TargetLabelName])
 		break
 	case TOKEN_JIZ:
-		ret = append(ret, neander.JZ, this.Parser.ByteCodeLabels[this.TargetLabelName])
-		break
-	case TOKEN_JIP:
-		ret = append(ret, neander.NOT)
-		ret = append(ret, neander.ADD, OneValue)
-		ret = append(ret, neander.JN, this.Parser.ByteCodeLabels[this.TargetLabelName])
+		ret = append(ret, neander.JZ, this.Parser.labels[this.TargetLabelName])
 		break
 	case TOKEN_JIN:
-		ret = append(ret, neander.JN, this.Parser.ByteCodeLabels[this.TargetLabelName])
+		ret = append(ret, neander.JN, this.Parser.labels[this.TargetLabelName])
 		break
+	default:
+		//TODO implement me
+		panic("implement me switch default branch in JumpStmt WriteMemASM implementation")
 	}
-	return ret
+	return ret, nil
 }
 
-func (this PureInstructionStmt) WriteMemASM() (ret []uint16) {
+func (this PureInstructionStmt) WriteMemASM() (ret []uint16, err error) {
 	switch this.Code {
 	case TOKEN_INC:
 		ret = append(ret, neander.ADD, OneValue)
@@ -212,10 +210,10 @@ func (this PureInstructionStmt) WriteMemASM() (ret []uint16) {
 		//TODO implement me
 		panic("implement me switch default branch in PureInstructionStmt WriteMemASM implementation")
 	}
-	return ret
+	return ret, nil
 }
 
-func (this SingleInstructionStmt) WriteMemASM() (ret []uint16) {
+func (this SingleInstructionStmt) WriteMemASM() (ret []uint16, err error) {
 	switch this.Code {
 	case TOKEN_GET:
 		if this.Left.Kind == TOKEN_NUMBER {
@@ -228,17 +226,13 @@ func (this SingleInstructionStmt) WriteMemASM() (ret []uint16) {
 	case TOKEN_SET:
 		ret = append(ret, neander.STA, this.GetLeftASUint16())
 		break
-	case TOKEN_MUL:
-		leftArg := this.GetLeftASUint16()
-		ret = append(ret, GetBuiltinMulFunc(uint16(len(ret)), leftArg)...)
-		break
 	case TOKEN_ADD:
 		ret = append(ret, neander.ADD, this.GetLeftASUint16())
 		break
 	case TOKEN_AND:
 		ret = append(ret, neander.AND, this.GetLeftASUint16())
 		break
-	case TOKEN_ORR:
+	case TOKEN_OR:
 		ret = append(ret, neander.OR, this.GetLeftASUint16())
 		break
 	case TOKEN_XOR:
@@ -260,10 +254,10 @@ func (this SingleInstructionStmt) WriteMemASM() (ret []uint16) {
 		//TODO implement me
 		panic("implement me switch default branch in SingleInstructionStmt WriteMemASM implementation")
 	}
-	return ret
+	return ret, nil
 }
 
-func (this DoubleInstructionStmt) WriteMemASM() (ret []uint16) {
+func (this DoubleInstructionStmt) WriteMemASM() (ret []uint16, err error) {
 	switch this.Code {
 	case TOKEN_CPY:
 		ret = append(ret, neander.STA, AcCache0Addr)
@@ -280,5 +274,5 @@ func (this DoubleInstructionStmt) WriteMemASM() (ret []uint16) {
 		//TODO implement me
 		panic("implement me switch default branch in DoubleInstructionStmt WriteMemASM implementation")
 	}
-	return ret
+	return ret, nil
 }

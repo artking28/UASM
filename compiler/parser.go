@@ -29,14 +29,14 @@ func ParseAll(parser *models.Parser) error {
 			}
 			break
 
-		case models.TOKEN_GET, models.TOKEN_SET, models.TOKEN_ADD, models.TOKEN_MUL, models.TOKEN_AND, models.TOKEN_ORR, models.TOKEN_XOR, models.TOKEN_SUB:
+		case models.TOKEN_GET, models.TOKEN_SET, models.TOKEN_ADD, models.TOKEN_AND, models.TOKEN_OR, models.TOKEN_XOR, models.TOKEN_SUB:
 			err := ParseSingleInstruction(parser)
 			if err != nil {
 				return err
 			}
 			break
 
-		case models.TOKEN_JMP, models.TOKEN_JIZ, models.TOKEN_JIN, models.TOKEN_JIP:
+		case models.TOKEN_JMP, models.TOKEN_JIZ, models.TOKEN_JIN:
 			err := ParseJumpInstruction(parser)
 			if err != nil {
 				return err

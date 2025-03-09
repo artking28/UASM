@@ -81,14 +81,11 @@ func (this Token) String(complete bool) string {
 	case TOKEN_ADD:
 		s = "TOKEN_ADD"
 		break
-	case TOKEN_MUL:
-		s = "TOKEN_MUL"
-		break
 	case TOKEN_AND:
 		s = "TOKEN_AND"
 		break
-	case TOKEN_ORR:
-		s = "TOKEN_ORR"
+	case TOKEN_OR:
+		s = "TOKEN_OR"
 		break
 	case TOKEN_XOR:
 		s = "TOKEN_XOR"
@@ -104,9 +101,6 @@ func (this Token) String(complete bool) string {
 		break
 	case TOKEN_JIN:
 		s = "TOKEN_JIN"
-		break
-	case TOKEN_JIP:
-		s = "TOKEN_JIP"
 		break
 	case TOKEN_HLT:
 		s = "TOKEN_HLT"
@@ -169,12 +163,10 @@ func ResolveTokenId(filename string, token Token) (Token, error) {
 		return NewToken(token.Pos, TOKEN_NOT, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("ADD") {
 		return NewToken(token.Pos, TOKEN_ADD, 1, []rune(value)...), nil
-	} else if strings.ToUpper(value) == ("MUL") {
-		return NewToken(token.Pos, TOKEN_MUL, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("AND") {
 		return NewToken(token.Pos, TOKEN_AND, 1, []rune(value)...), nil
-	} else if strings.ToUpper(value) == ("ORR") {
-		return NewToken(token.Pos, TOKEN_ORR, 1, []rune(value)...), nil
+	} else if strings.ToUpper(value) == ("OR") {
+		return NewToken(token.Pos, TOKEN_OR, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("XOR") {
 		return NewToken(token.Pos, TOKEN_XOR, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("SUB") {
@@ -185,8 +177,6 @@ func ResolveTokenId(filename string, token Token) (Token, error) {
 		return NewToken(token.Pos, TOKEN_JIZ, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("JIN") {
 		return NewToken(token.Pos, TOKEN_JIN, 1, []rune(value)...), nil
-	} else if strings.ToUpper(value) == ("JIP") {
-		return NewToken(token.Pos, TOKEN_JIP, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("HLT") {
 		return NewToken(token.Pos, TOKEN_HLT, 1, []rune(value)...), nil
 	} else {
@@ -235,9 +225,8 @@ const (
 
 	// Operations
 	TOKEN_ADD
-	TOKEN_MUL
 	TOKEN_AND
-	TOKEN_ORR
+	TOKEN_OR
 	TOKEN_XOR
 
 	// Loops and comparations
@@ -245,7 +234,6 @@ const (
 	TOKEN_JMP
 	TOKEN_JIZ
 	TOKEN_JIN
-	TOKEN_JIP
 
 	// Runtime actions
 	TOKEN_HLT

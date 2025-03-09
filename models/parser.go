@@ -11,12 +11,12 @@ type (
 	}
 
 	Parser struct {
-		Filename       string
-		memHep         MemHeap
-		ByteCodeLabels map[string]uint16
-		tokens         []Token
-		output         Ast
-		cursor         int
+		Filename string
+		labels   map[string]uint16
+		memHep   MemHeap
+		tokens   []Token
+		output   Ast
+		cursor   int
 	}
 )
 
@@ -25,8 +25,8 @@ func NewParser(filename string, tokens []Token) Parser {
 	l := GetLastConstant()
 	constants := GetBuiltinConstants()
 	return Parser{
-		Filename:       filename,
-		ByteCodeLabels: map[string]uint16{},
+		Filename: filename,
+		labels:   map[string]uint16{},
 		memHep: MemHeap{
 			content: constants,
 			last:    l,
@@ -44,7 +44,7 @@ func (this *Parser) AllocNum(num int16) uint16 {
 	return where - NeanderPadding + JmpConstantsSize
 }
 
-func (this *Parser) WriteProgram() []uint8 {
+func (this *Parser) WriteProgram() ([]uint8, error) {
 
 	var vec [][]uint16               // Guarda os bytes de cada statement
 	var stmtSizes int                // Tamanho em tempo real do programa
@@ -54,11 +54,14 @@ func (this *Parser) WriteProgram() []uint8 {
 		// Se for um statement de label, adiciona nos bytecode labels
 		if stmt.GetTitle() == "LabelDeclStmt" {
 			labelStmt := stmt.(LabelDeclStmt)
-			this.ByteCodeLabels[labelStmt.LabelName] = uint16(stmtSizes)
+			this.labels[labelStmt.LabelName] = uint16(stmtSizes)
 		}
 
 		// Transforma o statement em bytecode
-		bytes := stmt.WriteMemASM()
+		bytes, err := stmt.WriteMemASM()
+		if err != nil {
+			return nil, err
+		}
 
 		// Se for um jump, marca a label como pendencia de recalculo de posição
 		if stmt.GetTitle() == "JumpStmt" {
@@ -82,13 +85,19 @@ func (this *Parser) WriteProgram() []uint8 {
 	PaddingSize := uint16(len(neanderPrefix)) + constantsCount
 
 	// Recalcula a posicao das labels
-	for k := range this.ByteCodeLabels {
-		this.ByteCodeLabels[k] += PaddingSize
+	for k := range this.labels {
+		if this.labels[k] != 0 {
+			this.labels[k] += PaddingSize
+		}
 	}
 
 	// Aplica as novas posicoes das labels nos lugares onde elas foram chamadas
 	for k, v := range resolveLabel {
-		program[k] = this.ByteCodeLabels[v]
+		if this.labels[v] != 0 {
+			program[k] = this.labels[v]
+			continue
+		}
+		return nil, GetUnkownLabelErr(this.Filename, v)
 	}
 
 	// Garante q o programa não vai tentar executar o espaço reservado para constantes
@@ -115,7 +124,7 @@ func (this *Parser) WriteProgram() []uint8 {
 		final = append(final, make([]uint8, 516-endAt)...)
 	}
 
-	return final
+	return final, nil
 }
 
 func (this *Parser) Inject(stmts ...Stmt) {

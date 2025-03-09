@@ -27,6 +27,7 @@ const (
 	UnexpectedTokenErrCode
 	ExpectedTokenErrCode
 	InvalidMinmonicErrCode
+	UnkownLabelErrCode
 	UnkownFailureErrCode
 
 	NilPointerExceptionErrLabel ErrLabel = "error.nil.pointer"
@@ -37,6 +38,7 @@ const (
 	UnexpectedTokenErrLabel     ErrLabel = "error.unexpected.token"
 	ExpectedTokenErrLabel       ErrLabel = "error.expected.token"
 	InvalidMinmonicErrLabel     ErrLabel = "error.invalid.minmonic"
+	UnkownLabelErrLabel         ErrLabel = "error.unkown.label"
 	UnkownFailureErrLabel       ErrLabel = "error.unkown.failure"
 )
 
@@ -109,6 +111,14 @@ func GetExpectedTokenErr(filename string, phrase string, pos Pos) Err {
 		Code:  UnexpectedTokenErrCode,
 		Label: UnexpectedTokenErrLabel,
 		Msg:   fmt.Sprintf("Missing %s in the file '%s' at line %d, column %d.", phrase, filename, pos.Line, pos.Column),
+	}
+}
+
+func GetUnkownLabelErr(filename string, label string) Err {
+	return Err{
+		Code:  UnkownLabelErrCode,
+		Label: UnkownLabelErrLabel,
+		Msg:   fmt.Sprintf("Jump to label '%s' failed: label not found in in file '%s'.", label, filename),
 	}
 }
 

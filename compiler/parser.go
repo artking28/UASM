@@ -71,7 +71,7 @@ func ParseComment(parser *models.Parser) error {
 		comment += string(here.Value)
 		parser.Consume(1)
 	}
-	parser.Inject(models.NewCommentStmt(comment, h0.Pos))
+	parser.Inject(models.NewCommentStmt(comment, h0.Pos, parser))
 	return nil
 }
 
@@ -88,7 +88,7 @@ func ParseLabelDecl(parser *models.Parser) error {
 	if h1 == nil {
 		return models.GetExpectedTokenErr(parser.Filename, "valid identifier", h0.Pos)
 	}
-	parser.Inject(models.NewLabelDeclStmt(string(h1.Value), h0.Pos))
+	parser.Inject(models.NewLabelDeclStmt(string(h1.Value), h0.Pos, parser))
 	parser.Consume(1)
 	return nil
 }
@@ -106,7 +106,7 @@ func ParseJumpInstruction(parser *models.Parser) error {
 	if h1 == nil {
 		return models.GetExpectedTokenErr(parser.Filename, "label", h0.Pos)
 	}
-	parser.Inject(models.NewJumpStmt(string(h1.Value), h0.String(false), h0.Pos))
+	parser.Inject(models.NewJumpStmt(string(h1.Value), h0.String(false), h0.Pos, parser))
 	parser.Consume(1)
 	return nil
 }
@@ -116,7 +116,7 @@ func ParsePureInstruction(parser *models.Parser) error {
 	if h0 == nil {
 		return models.GetUnexpectedTokenNoPosErr(parser.Filename, "EOF")
 	}
-	parser.Inject(models.NewPureInstructionStmt(h0.Kind, h0.Pos))
+	parser.Inject(models.NewPureInstructionStmt(h0.Kind, h0.Pos, parser))
 	parser.Consume(1)
 	return nil
 }
@@ -138,7 +138,7 @@ func ParseSingleInstruction(parser *models.Parser) error {
 	if h1 == nil {
 		return models.GetExpectedTokenErr(parser.Filename, phrase, h0.Pos)
 	}
-	parser.Inject(models.NewSingleInstructionStmt(h0.Kind, h0.Pos, *h1))
+	parser.Inject(models.NewSingleInstructionStmt(h0.Kind, h0.Pos, *h1, parser))
 	return nil
 }
 
@@ -161,6 +161,6 @@ func ParseDoubleInstruction(parser *models.Parser) error {
 		return models.GetExpectedTokenErr(parser.Filename, "memory address or number literal", h0.Pos)
 	}
 
-	parser.Inject(models.NewDoubleInstructionStmt(h0.Kind, h0.Pos, *h1, *h2))
+	parser.Inject(models.NewDoubleInstructionStmt(h0.Kind, h0.Pos, *h1, *h2, parser))
 	return nil
 }

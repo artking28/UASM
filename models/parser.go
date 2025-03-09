@@ -5,42 +5,46 @@ import (
 	mgu "github.com/artking28/myGoUtils"
 )
 
-type Parser struct {
-	Filename string
-	labels   map[string]int
-	tokens   []Token
-	output   Ast
-	cursor   int
-}
+type (
+	MemHeap struct {
+		content map[uint16]int16
+		last    uint16
+	}
+
+	Parser struct {
+		Filename string
+		memHep   MemHeap
+		labels   map[string]int
+		tokens   []Token
+		output   Ast
+		cursor   int
+	}
+)
 
 func NewParser(filename string, tokens []Token) Parser {
+	// Pega o index da ultima constante declarada
+	l := GetLastConstant()
+	constants := GetBuiltinConstants()
 	return Parser{
 		Filename: filename,
-		output:   Ast{},
-		tokens:   tokens,
-		cursor:   0,
+		memHep: MemHeap{
+			content: constants,
+			last:    l,
+		},
+		output: Ast{},
+		tokens: tokens,
+		cursor: 0,
 	}
 }
 
-func (this *Parser) WriteProgram(forceSize bool) []uint8 {
+func (this *Parser) AllocNum(num int16) uint16 {
+	this.memHep.last++
+	where := this.memHep.last
+	this.memHep.content[where] = num
+	return where - NeanderPadding + JmpConstantsSize
+}
 
-	// Prefixo do Neander.
-	constants := GetBuiltinConstants()
-	neanderPrefix := []uint16{1, 1}
-	constantsCount := uint16(len(constants))
-	// O padding de constantes n pode ser impar
-	if constantsCount%2 == 1 {
-		constantsCount++
-	}
-	PaddingSize := uint16(len(neanderPrefix)) + constantsCount
-
-	// Garante q o programa não vai tentar executar o espaço reservado para constantes
-	neanderPrefix = append(neanderPrefix, neander.JMP, PaddingSize)
-	// Adiciona as constantes e os espaços de memória reversados.
-	neanderPrefix = append(neanderPrefix, make([]uint16, constantsCount)...)
-	for k, v := range constants {
-		neanderPrefix[k] = uint16(uint8(v))
-	}
+func (this *Parser) WriteProgram() []uint8 {
 
 	// Transform os statements em bytecode e os reúne em 'program'.
 	vec := mgu.VecMap(this.output.Statements, func(stmt Stmt) []uint16 {
@@ -49,6 +53,22 @@ func (this *Parser) WriteProgram(forceSize bool) []uint8 {
 	var program []uint16
 	for _, bytes := range vec {
 		program = append(program, bytes...)
+	}
+
+	// Prefixo do Neander.
+	//constants := GetBuiltinConstants()
+	constants := this.memHep.content
+	neanderPrefix := []uint16{1, 1}
+	constantsCount := uint16(len(constants))
+	// O padding de constantes n pode ser impar
+	PaddingSize := uint16(len(neanderPrefix)) + constantsCount
+
+	// Garante q o programa não vai tentar executar o espaço reservado para constantes
+	neanderPrefix = append(neanderPrefix, neander.JMP, PaddingSize)
+	// Adiciona as constantes e os espaços de memória reversados.
+	neanderPrefix = append(neanderPrefix, make([]uint16, constantsCount)...)
+	for k, v := range constants {
+		neanderPrefix[k] = uint16(uint8(v))
 	}
 
 	// Reúne todas as partes.

@@ -116,6 +116,7 @@ func PrintProgram(program []byte, hexa, printTail, continueAfterHlt bool) {
 		switch mnemonic {
 		case NOP:
 			fmt.Printf(" NOP\n")
+			i -= 2
 			break
 		case STA:
 			str := fmt.Sprintf(" STA %.3d(value = %d)\n", addr, int8(addrV))
@@ -184,9 +185,9 @@ func PrintProgram(program []byte, hexa, printTail, continueAfterHlt bool) {
 			}
 			break
 		default:
-			str := fmt.Sprintf(" %.3d\n", addr)
+			str := fmt.Sprintf(" %.3d\n", mnemonic)
 			if hexa {
-				str = fmt.Sprintf(" 0x%.2x\n", addr)
+				str = fmt.Sprintf(" 0x%.2x\n", mnemonic)
 			}
 			i -= 2
 			fmt.Print(str)

@@ -1,6 +1,9 @@
 package models
 
-import "UASM/neander"
+import (
+	"UASM/neander"
+	mgu "github.com/artking28/myGoUtils"
+)
 
 const NeanderPadding = 4   // 4 bytes
 const JmpConstantsSize = 2 // 2 bytes
@@ -15,15 +18,26 @@ const (
 	SiAddr
 )
 
+func GetLastConstant() uint16 {
+	keys := mgu.MapKeys(GetBuiltinConstants())
+	m := keys[0]
+	for _, k := range keys {
+		if k > m {
+			m = k
+		}
+	}
+	return m
+}
+
 func GetBuiltinConstants() map[uint16]int16 {
 	return map[uint16]int16{
-		SiAddr + NeanderPadding - JmpConstantsSize:            0,
-		AcCache1Addr + NeanderPadding - JmpConstantsSize:      0,
-		AcCache0Addr + NeanderPadding - JmpConstantsSize:      0,
-		AlternateOneValue + NeanderPadding - JmpConstantsSize: 1,
-		MinusOneValue + NeanderPadding - JmpConstantsSize:     -1,
-		ZeroValue + NeanderPadding - JmpConstantsSize:         0,
 		OneValue + NeanderPadding - JmpConstantsSize:          1,
+		ZeroValue + NeanderPadding - JmpConstantsSize:         0,
+		MinusOneValue + NeanderPadding - JmpConstantsSize:     -1,
+		AlternateOneValue + NeanderPadding - JmpConstantsSize: 1,
+		AcCache0Addr + NeanderPadding - JmpConstantsSize:      0,
+		AcCache1Addr + NeanderPadding - JmpConstantsSize:      0,
+		SiAddr + NeanderPadding - JmpConstantsSize:            0,
 	}
 }
 
@@ -65,16 +79,6 @@ func GetBuiltinMulFunc(start uint16, arg uint16) []uint16 {
 	return append(fin, p3...)
 }
 
-type heapStruct struct {
-	content []uint16
-	last    int8
-}
-
-//var heap = heapStruct{
-//    start
-//    content: []uint16{},
-//    last:    0,
-//}
 //
 //func AlocateNum(value uint16) int8 {
 //    if heap == nil {

@@ -21,8 +21,9 @@ type (
 	}
 
 	StmtBase struct {
-		Title string `json:"title"`
-		Pos   Pos    `json:"pos"`
+		Parser *Parser `json:"-"`
+		Title  string  `json:"title"`
+		Pos    Pos     `json:"pos"`
 	}
 
 	CommentStmt struct {
@@ -66,50 +67,54 @@ func (this Ast) Inspect() {
 	fmt.Printf("%s\n", string(str))
 }
 
-func NewCommentStmt(content string, pos Pos) CommentStmt {
+func NewCommentStmt(content string, pos Pos, parser *Parser) CommentStmt {
 	return CommentStmt{
 		Value: content,
 		StmtBase: StmtBase{
-			Title: "CommentStmt",
-			Pos:   pos,
+			Parser: parser,
+			Title:  "CommentStmt",
+			Pos:    pos,
 		},
 	}
 }
 
-func NewLabelDeclStmt(labelName string, pos Pos) LabelDeclStmt {
+func NewLabelDeclStmt(labelName string, pos Pos, parser *Parser) LabelDeclStmt {
 	return LabelDeclStmt{
 		LabelName: labelName,
 		StmtBase: StmtBase{
-			Title: "LabelDeclStmt",
-			Pos:   pos,
+			Parser: parser,
+			Title:  "LabelDeclStmt",
+			Pos:    pos,
 		},
 	}
 }
 
-func NewJumpStmt(targetLabelName, jumpKind string, pos Pos) JumpStmt {
+func NewJumpStmt(targetLabelName, jumpKind string, pos Pos, parser *Parser) JumpStmt {
 	return JumpStmt{
 		TargetLabelName: targetLabelName,
 		JumpKind:        jumpKind,
 		StmtBase: StmtBase{
-			Title: "JumpStmt",
-			Pos:   pos,
+			Parser: parser,
+			Title:  "JumpStmt",
+			Pos:    pos,
 		},
 	}
 }
 
-func NewPureInstructionStmt(code TokenKindEnum, pos Pos) PureInstructionStmt {
+func NewPureInstructionStmt(code TokenKindEnum, pos Pos, parser *Parser) PureInstructionStmt {
 	return PureInstructionStmt{
 		Code: code,
 		StmtBase: StmtBase{
-			Title: "PureInstructionStmt",
-			Pos:   pos,
+			Parser: parser,
+			Title:  "PureInstructionStmt",
+			Pos:    pos,
 		},
 	}
 }
 
-func NewSingleInstructionStmt(code TokenKindEnum, pos Pos, left Token) SingleInstructionStmt {
+func NewSingleInstructionStmt(code TokenKindEnum, pos Pos, left Token, parser *Parser) SingleInstructionStmt {
 	s := SingleInstructionStmt{
-		PureInstructionStmt: NewPureInstructionStmt(code, pos),
+		PureInstructionStmt: NewPureInstructionStmt(code, pos, parser),
 		Left:                left,
 	}
 	s.StmtBase.Title = "SingleInstructionStmt"
@@ -120,9 +125,9 @@ func (this SingleInstructionStmt) GetLeftASUint16() uint16 {
 	return uint16(this.Left.Value[0])
 }
 
-func NewDoubleInstructionStmt(code TokenKindEnum, pos Pos, left, right Token) DoubleInstructionStmt {
+func NewDoubleInstructionStmt(code TokenKindEnum, pos Pos, left, right Token, parser *Parser) DoubleInstructionStmt {
 	d := DoubleInstructionStmt{
-		SingleInstructionStmt: NewSingleInstructionStmt(code, pos, left),
+		SingleInstructionStmt: NewSingleInstructionStmt(code, pos, left, parser),
 		Right:                 right,
 	}
 	d.StmtBase.Title = "DoubleInstructionStmt"
@@ -177,7 +182,8 @@ func (this SingleInstructionStmt) WriteMemASM() (ret []uint16) {
 	switch this.Code {
 	case TOKEN_GET:
 		if this.Left.Kind == TOKEN_NUMBER {
-			ret = append(ret, neander.LDA, this.GetLeftASUint16())
+			memAddr := this.Parser.AllocNum(int16(this.GetLeftASUint16()))
+			ret = append(ret, neander.LDA, memAddr)
 			break
 		}
 		ret = append(ret, neander.LDA, this.GetLeftASUint16())

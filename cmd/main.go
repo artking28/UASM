@@ -56,7 +56,7 @@ func AssemblerTest() {
 	}
 
 	//parser.Inspect()
-	err = os.WriteFile(outputFile, parser.WriteProgram(true), 0744)
+	err = os.WriteFile(outputFile, parser.WriteProgram(), 0744)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

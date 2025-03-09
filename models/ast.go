@@ -182,7 +182,8 @@ func (this JumpStmt) WriteMemASM() (ret []uint16) {
 	case TOKEN_JIP:
 		ret = append(ret, neander.NOT)
 		ret = append(ret, neander.ADD, OneValue)
-		fallthrough
+		ret = append(ret, neander.JN, this.Parser.ByteCodeLabels[this.TargetLabelName])
+		break
 	case TOKEN_JIN:
 		ret = append(ret, neander.JN, this.Parser.ByteCodeLabels[this.TargetLabelName])
 		break
@@ -259,6 +260,7 @@ func (this SingleInstructionStmt) WriteMemASM() (ret []uint16) {
 func (this DoubleInstructionStmt) WriteMemASM() (ret []uint16) {
 	switch this.Code {
 	case TOKEN_CPY:
+		ret = append(ret, neander.STA, AcCache0Addr)
 		if this.Right.Kind == TOKEN_NUMBER {
 			memAddr := this.Parser.AllocNum(int16(this.GetRightASUint16()))
 			ret = append(ret, neander.LDA, memAddr)
@@ -266,6 +268,7 @@ func (this DoubleInstructionStmt) WriteMemASM() (ret []uint16) {
 			ret = append(ret, neander.LDA, this.GetRightASUint16())
 		}
 		ret = append(ret, neander.STA, this.GetLeftASUint16())
+		ret = append(ret, neander.LDA, AcCache0Addr)
 		break
 	default:
 		//TODO implement me

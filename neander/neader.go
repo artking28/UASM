@@ -6,7 +6,7 @@ import (
 )
 
 type Result struct {
-	Ac, Pc byte
+	Ac, Pc int8
 }
 
 const (
@@ -36,23 +36,23 @@ func RunProgram(program []byte, hexa, printFinalState bool) (Result, []byte) {
 			continue
 		case STA:
 			result.Pc += 2
-			program[addrValueIndex] = result.Ac
+			program[addrValueIndex] = byte(result.Ac)
 			break
 		case LDA:
 			result.Pc += 2
-			result.Ac = program[addrValueIndex]
+			result.Ac = int8(program[addrValueIndex])
 			break
 		case ADD:
 			result.Pc += 2
-			result.Ac += program[addrValueIndex]
+			result.Ac += int8(program[addrValueIndex])
 			break
 		case OR:
 			result.Pc += 2
-			result.Ac |= program[addrValueIndex]
+			result.Ac |= int8(program[addrValueIndex])
 			break
 		case AND:
 			result.Pc += 2
-			result.Ac &= program[addrValueIndex]
+			result.Ac &= int8(program[addrValueIndex])
 			break
 		case NOT:
 			i -= 2
@@ -60,17 +60,17 @@ func RunProgram(program []byte, hexa, printFinalState bool) (Result, []byte) {
 			result.Ac = ^result.Ac
 			break
 		case JMP:
-			result.Pc = addr
+			result.Pc = int8(addr)
 			i = addrValueIndex - padding
 			break
 		case JN:
-			result.Pc = addr
-			if result.Ac != 0 {
+			result.Pc = int8(addr)
+			if result.Ac < 0 {
 				i = addrValueIndex - padding
 			}
 			continue
 		case JZ:
-			result.Pc = addr
+			result.Pc = int8(addr)
 			if result.Ac == 0 {
 				i = addrValueIndex - padding
 			}

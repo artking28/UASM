@@ -208,11 +208,14 @@ func (this SingleInstructionStmt) WriteMemASM() (ret []uint16) {
 		//ret = append(ret, neander.XOR, this.GetLeftASUint16())
 		break
 	case TOKEN_CMP:
-		//TODO implement me
-		panic("implement me, TOKEN_CMP materialize")
+		ret = append(ret, neander.STA, AcCache0Addr)
+		ret = append(ret, neander.LDA, this.GetLeftASUint16())
+		ret = append(ret, neander.NOT)
+		ret = append(ret, neander.ADD, OneValue)
+		ret = append(ret, neander.ADD, AcCache0Addr)
 	default:
 		//TODO implement me
-		panic("implement me switch default branch in PureInstructionStmt WriteMemASM implementation")
+		panic("implement me switch default branch in SingleInstructionStmt WriteMemASM implementation")
 	}
 	return ret
 }
@@ -230,7 +233,7 @@ func (this DoubleInstructionStmt) WriteMemASM() (ret []uint16) {
 		break
 	default:
 		//TODO implement me
-		panic("implement me switch default branch in PureInstructionStmt WriteMemASM implementation")
+		panic("implement me switch default branch in DoubleInstructionStmt WriteMemASM implementation")
 	}
 	return ret
 }

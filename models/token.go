@@ -18,7 +18,7 @@ type (
 )
 
 func NewToken(pos Pos, kind TokenKindEnum, repeat int, value ...rune) Token {
-	return Token{pos, kind, value, repeat}
+	return Token{Pos: pos, Kind: kind, Value: value, Repeat: repeat}
 }
 
 func (this Token) String(complete bool) string {
@@ -93,8 +93,8 @@ func (this Token) String(complete bool) string {
 	case TOKEN_XOR:
 		s = "TOKEN_XOR"
 		break
-	case TOKEN_CMP:
-		s = "TOKEN_CMP"
+	case TOKEN_SUB:
+		s = "TOKEN_SUB"
 		break
 	case TOKEN_JMP:
 		s = "TOKEN_JMP"
@@ -177,8 +177,8 @@ func ResolveTokenId(filename string, token Token) (Token, error) {
 		return NewToken(token.Pos, TOKEN_ORR, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("XOR") {
 		return NewToken(token.Pos, TOKEN_XOR, 1, []rune(value)...), nil
-	} else if strings.ToUpper(value) == ("CMP") {
-		return NewToken(token.Pos, TOKEN_CMP, 1, []rune(value)...), nil
+	} else if strings.ToUpper(value) == ("SUB") {
+		return NewToken(token.Pos, TOKEN_SUB, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("JMP") {
 		return NewToken(token.Pos, TOKEN_JMP, 1, []rune(value)...), nil
 	} else if strings.ToUpper(value) == ("JIZ") {
@@ -194,7 +194,7 @@ func ResolveTokenId(filename string, token Token) (Token, error) {
 		if err == nil {
 			return NewToken(token.Pos, TOKEN_NUMBER, 1, rune(num)), nil
 		}
-		return NewToken(token.Pos, TOKEN_NUMBER, 1, rune(num)), GetUnexpectedTokenErr(filename, string(token.Value), token.Pos)
+		//return NewToken(token.Pos, TOKEN_NUMBER, 1, rune(num)), GetUnexpectedTokenErr(filename, string(token.Value), token.Pos)
 	}
 
 	return token, nil
@@ -241,7 +241,7 @@ const (
 	TOKEN_XOR
 
 	// Loops and comparations
-	TOKEN_CMP
+	TOKEN_SUB
 	TOKEN_JMP
 	TOKEN_JIZ
 	TOKEN_JIN

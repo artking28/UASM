@@ -18,7 +18,8 @@ func Tokenize(filename string) ([]models.Token, error) {
 
 	var ret []models.Token
 	column, line := 0, 1
-	isComment, runes := false, []rune(string(bytes))
+	isComment, islabel := false, false
+	runes := []rune(string(bytes))
 	buffer := strings.Builder{}
 	for i, run := range runes {
 		column++
@@ -40,6 +41,9 @@ func Tokenize(filename string) ([]models.Token, error) {
 				}
 			}
 			models.AppendToken(&ret, tk)
+			if islabel {
+				islabel = false
+			}
 			buffer.Reset()
 		}
 		switch run {
@@ -75,6 +79,7 @@ func Tokenize(filename string) ([]models.Token, error) {
 			pos := models.Pos{Line: int64(line), Column: int64(column)}
 			tk := models.NewToken(pos, models.TOKEN_HASHTAG, 1, run)
 			models.AppendToken(&ret, tk)
+			islabel = true
 			break
 		case '/':
 			pos := models.Pos{Line: int64(line), Column: int64(column)}

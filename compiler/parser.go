@@ -29,7 +29,7 @@ func ParseAll(parser *models.Parser) error {
 			}
 			break
 
-		case models.TOKEN_GET, models.TOKEN_SET, models.TOKEN_ADD, models.TOKEN_MUL, models.TOKEN_AND, models.TOKEN_ORR, models.TOKEN_XOR, models.TOKEN_CMP:
+		case models.TOKEN_GET, models.TOKEN_SET, models.TOKEN_ADD, models.TOKEN_MUL, models.TOKEN_AND, models.TOKEN_ORR, models.TOKEN_XOR, models.TOKEN_SUB:
 			err := ParseSingleInstruction(parser)
 			if err != nil {
 				return err
@@ -54,6 +54,7 @@ func ParseAll(parser *models.Parser) error {
 		}
 		parser.Consume(1)
 	}
+
 	return nil
 }
 
@@ -89,7 +90,6 @@ func ParseLabelDecl(parser *models.Parser) error {
 		return models.GetExpectedTokenErr(parser.Filename, "valid identifier", h0.Pos)
 	}
 	parser.Inject(models.NewLabelDeclStmt(string(h1.Value), h0.Pos, parser))
-	parser.Consume(1)
 	return nil
 }
 
@@ -106,8 +106,7 @@ func ParseJumpInstruction(parser *models.Parser) error {
 	if h1 == nil {
 		return models.GetExpectedTokenErr(parser.Filename, "label", h0.Pos)
 	}
-	parser.Inject(models.NewJumpStmt(string(h1.Value), h0.String(false), h0.Pos, parser))
-	parser.Consume(1)
+	parser.Inject(models.NewJumpStmt(string(h1.Value), h0.Kind, h0.Pos, parser))
 	return nil
 }
 

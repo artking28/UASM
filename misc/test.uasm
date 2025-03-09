@@ -1,2 +1,12 @@
-inc // !ok
-hlt // !ok
+inc
+inc
+inc
+inc
+inc
+inc
+jip #here
+inc
+inc
+inc
+#here
+hlt

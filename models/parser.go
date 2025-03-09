@@ -2,7 +2,6 @@ package models
 
 import (
 	"UASM/neander"
-	mgu "github.com/artking28/myGoUtils"
 )
 
 type (
@@ -12,12 +11,12 @@ type (
 	}
 
 	Parser struct {
-		Filename string
-		memHep   MemHeap
-		labels   map[string]int
-		tokens   []Token
-		output   Ast
-		cursor   int
+		Filename       string
+		memHep         MemHeap
+		ByteCodeLabels map[string]uint16
+		tokens         []Token
+		output         Ast
+		cursor         int
 	}
 )
 
@@ -26,7 +25,8 @@ func NewParser(filename string, tokens []Token) Parser {
 	l := GetLastConstant()
 	constants := GetBuiltinConstants()
 	return Parser{
-		Filename: filename,
+		Filename:       filename,
+		ByteCodeLabels: map[string]uint16{},
 		memHep: MemHeap{
 			content: constants,
 			last:    l,
@@ -46,10 +46,22 @@ func (this *Parser) AllocNum(num int16) uint16 {
 
 func (this *Parser) WriteProgram() []uint8 {
 
-	// Transform os statements em bytecode e os reúne em 'program'.
-	vec := mgu.VecMap(this.output.Statements, func(stmt Stmt) []uint16 {
-		return stmt.WriteMemASM()
-	})
+	var vec [][]uint16
+	var stmtSizes int
+	resolveLabel := map[int]string{}
+	for _, stmt := range this.output.Statements {
+		if stmt.GetTitle() == "LabelDeclStmt" {
+			labelStmt := stmt.(LabelDeclStmt)
+			this.ByteCodeLabels[labelStmt.LabelName] = uint16(stmtSizes)
+		}
+		bytes := stmt.WriteMemASM()
+		if stmt.GetTitle() == "JumpStmt" {
+			jmpStmt := stmt.(JumpStmt)
+			resolveLabel[stmtSizes+len(bytes)-1] = jmpStmt.TargetLabelName
+		}
+		stmtSizes += len(bytes)
+		vec = append(vec, bytes)
+	}
 	var program []uint16
 	for _, bytes := range vec {
 		program = append(program, bytes...)
@@ -58,10 +70,18 @@ func (this *Parser) WriteProgram() []uint8 {
 	// Prefixo do Neander.
 	//constants := GetBuiltinConstants()
 	constants := this.memHep.content
-	neanderPrefix := []uint16{1, 1}
 	constantsCount := uint16(len(constants))
+	neanderPrefix := []uint16{1, 1}
 	// O padding de constantes n pode ser impar
 	PaddingSize := uint16(len(neanderPrefix)) + constantsCount
+
+	for k := range this.ByteCodeLabels {
+		this.ByteCodeLabels[k] += PaddingSize
+	}
+
+	for k, v := range resolveLabel {
+		program[k] = this.ByteCodeLabels[v]
+	}
 
 	// Garante q o programa não vai tentar executar o espaço reservado para constantes
 	neanderPrefix = append(neanderPrefix, neander.JMP, PaddingSize)

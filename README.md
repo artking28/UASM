@@ -136,12 +136,12 @@ um numero nem um underline. Segue a criação de quatro labels abaixo:
 
 ## Loops and comparations
 
-### 13. `CMP` - **Compare**
+### 13. `SUB` - **Compare**
 - Aplica subtração entre o acumulador e o valor da memória passada.
 - **Exemplo de uso**:
 
   ```asm
-  CMP m1 // Aplica a operação 'xor' entre o conteudo de m1 e o acumulador. Salva no acumulador
+  SUB m1 // Aplica a operação 'xor' entre o conteudo de m1 e o acumulador. Salva no acumulador
 
 ### 14. `JMP` - **Jump**
 - Faz o salto para a 'label' especificado.

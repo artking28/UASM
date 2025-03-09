@@ -18,6 +18,7 @@ type (
 
 	Stmt interface {
 		WriteMemASM() []uint16
+		GetTitle() string
 	}
 
 	StmtBase struct {
@@ -37,8 +38,8 @@ type (
 	}
 
 	JumpStmt struct {
-		TargetLabelName string `json:"TargetLabelName"`
-		JumpKind        string `json:"jumpKind"`
+		TargetLabelName string        `json:"TargetLabelName"`
+		JumpKind        TokenKindEnum `json:"jumpKind"`
 		StmtBase
 	}
 
@@ -89,7 +90,7 @@ func NewLabelDeclStmt(labelName string, pos Pos, parser *Parser) LabelDeclStmt {
 	}
 }
 
-func NewJumpStmt(targetLabelName, jumpKind string, pos Pos, parser *Parser) JumpStmt {
+func NewJumpStmt(targetLabelName string, jumpKind TokenKindEnum, pos Pos, parser *Parser) JumpStmt {
 	return JumpStmt{
 		TargetLabelName: targetLabelName,
 		JumpKind:        jumpKind,
@@ -138,20 +139,55 @@ func (this DoubleInstructionStmt) GetRightASUint16() uint16 {
 	return uint16(this.Right.Value[0])
 }
 
+func (this CommentStmt) GetTitle() string {
+	return this.Title
+}
+
+func (this LabelDeclStmt) GetTitle() string {
+	return this.Title
+}
+
+func (this JumpStmt) GetTitle() string {
+	return this.Title
+}
+
+func (this PureInstructionStmt) GetTitle() string {
+	return this.Title
+}
+
+func (this SingleInstructionStmt) GetTitle() string {
+	return this.Title
+}
+
+func (this DoubleInstructionStmt) GetTitle() string {
+	return this.Title
+}
+
 func (this CommentStmt) WriteMemASM() []uint16 {
 	return []uint16{}
 }
 
 func (this LabelDeclStmt) WriteMemASM() []uint16 {
-	//TODO implement me
-	panic("implement me LabelDeclStmt WriteMemASM")
 	return []uint16{}
 }
 
-func (this JumpStmt) WriteMemASM() []uint16 {
-	//TODO implement me
-	panic("implement me JumpStmt WriteMemASM")
-	return []uint16{}
+func (this JumpStmt) WriteMemASM() (ret []uint16) {
+	switch this.JumpKind {
+	case TOKEN_JMP:
+		ret = append(ret, neander.JMP, this.Parser.ByteCodeLabels[this.TargetLabelName])
+		break
+	case TOKEN_JIZ:
+		ret = append(ret, neander.JZ, this.Parser.ByteCodeLabels[this.TargetLabelName])
+		break
+	case TOKEN_JIP:
+		ret = append(ret, neander.NOT)
+		ret = append(ret, neander.ADD, OneValue)
+		fallthrough
+	case TOKEN_JIN:
+		ret = append(ret, neander.JN, this.Parser.ByteCodeLabels[this.TargetLabelName])
+		break
+	}
+	return ret
 }
 
 func (this PureInstructionStmt) WriteMemASM() (ret []uint16) {
@@ -207,7 +243,7 @@ func (this SingleInstructionStmt) WriteMemASM() (ret []uint16) {
 	case TOKEN_XOR:
 		//ret = append(ret, neander.XOR, this.GetLeftASUint16())
 		break
-	case TOKEN_CMP:
+	case TOKEN_SUB:
 		ret = append(ret, neander.STA, AcCache0Addr)
 		ret = append(ret, neander.LDA, this.GetLeftASUint16())
 		ret = append(ret, neander.NOT)

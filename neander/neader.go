@@ -119,9 +119,9 @@ func PrintProgram(program []byte, hexa, printTail, continueAfterHlt bool) {
 			i -= 2
 			break
 		case STA:
-			str := fmt.Sprintf(" STA %.3d(value = %d)\n", addr, int8(addrV))
+			str := fmt.Sprintf(" STA %.3d\n", addr)
 			if hexa {
-				str = fmt.Sprintf(" STA 0x%.2x(value = 0x%.2x)\n", addr, addrV)
+				str = fmt.Sprintf(" STA 0x%.2x\n", addr)
 			}
 			fmt.Print(str)
 			break

@@ -135,7 +135,7 @@ func NewDoubleInstructionStmt(code TokenKindEnum, pos Pos, left, right Token, pa
 }
 
 func (this DoubleInstructionStmt) GetRightASUint16() uint16 {
-	return uint16(this.Left.Value[0])
+	return uint16(this.Right.Value[0])
 }
 
 func (this CommentStmt) WriteMemASM() []uint16 {
@@ -218,7 +218,19 @@ func (this SingleInstructionStmt) WriteMemASM() (ret []uint16) {
 }
 
 func (this DoubleInstructionStmt) WriteMemASM() (ret []uint16) {
-	//TODO implement me
-	panic("implement me")
+	switch this.Code {
+	case TOKEN_CPY:
+		if this.Right.Kind == TOKEN_NUMBER {
+			memAddr := this.Parser.AllocNum(int16(this.GetRightASUint16()))
+			ret = append(ret, neander.LDA, memAddr)
+		} else {
+			ret = append(ret, neander.LDA, this.GetRightASUint16())
+		}
+		ret = append(ret, neander.STA, this.GetLeftASUint16())
+		break
+	default:
+		//TODO implement me
+		panic("implement me switch default branch in PureInstructionStmt WriteMemASM implementation")
+	}
 	return ret
 }

@@ -11,23 +11,31 @@ import (
 	"strings"
 )
 
+const DEBUG = ""
+
 func main() {
 
+	const isDebug = len(DEBUG) > 0
 	count := len(os.Args)
-	if count < 2 || count > 3 {
-		log.Fatal(errors.New("error: inválid arguments"))
+	if !isDebug {
+		if count < 2 || count > 3 {
+			log.Fatal(errors.New("error: inválid arguments"))
+		}
 	}
 
-	inputFile := os.Args[1]
-	if !strings.HasSuffix(inputFile, ".uasm") {
-		log.Fatal(errors.New("error: this is not a UASM file. Please, rename it before compiling"))
+	inputFile := DEBUG
+	if !isDebug {
+		inputFile = os.Args[1]
+	}
+	if !strings.HasSuffix(inputFile, ".asm") {
+		log.Fatal(errors.New("error: this file " + inputFile + " is not a ASM file. Please, rename it before compiling"))
 	}
 
-	outputFile := strings.Split(inputFile, ".uasm")[0] + ".mem"
-	if count == 3 {
+	outputFile := strings.Split(inputFile, ".asm")[0] + ".bin"
+	if count == 3 && !isDebug {
 		outputFile = os.Args[2]
-		if !strings.HasSuffix(outputFile, ".mem") {
-			log.Fatal(errors.New("error: this is not a MEM output file. Please, choose another name to output file"))
+		if !strings.HasSuffix(outputFile, ".bin") {
+			log.Fatal(errors.New("error: this is not a bin output file. Please, choose another name to output file"))
 		}
 	}
 	tokens, err := compiler.Tokenize(inputFile)
@@ -51,10 +59,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+
+	InterpreterTest()
 }
 
 func InterpreterTest() {
-	bytes, err := os.ReadFile("misc/output.mem")
+	bytes, err := os.ReadFile("misc/test.bin")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}

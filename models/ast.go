@@ -17,7 +17,7 @@ type (
 	}
 
 	Stmt interface {
-		WriteMemASM() ([]uint16, error)
+		WriteMemASM() ([]uint16, []uint16, error)
 		GetTitle() string
 	}
 
@@ -163,15 +163,15 @@ func (this DoubleInstructionStmt) GetTitle() string {
 	return this.Title
 }
 
-func (this CommentStmt) WriteMemASM() (ret []uint16, err error) {
-	return []uint16{}, nil
+func (this CommentStmt) WriteMemASM() (ret []uint16, reviewOffset []uint16, err error) {
+	return []uint16{}, nil, nil
 }
 
-func (this LabelDeclStmt) WriteMemASM() (ret []uint16, err error) {
-	return []uint16{}, nil
+func (this LabelDeclStmt) WriteMemASM() (ret []uint16, reviewOffset []uint16, err error) {
+	return []uint16{}, nil, nil
 }
 
-func (this JumpStmt) WriteMemASM() (ret []uint16, err error) {
+func (this JumpStmt) WriteMemASM() (ret []uint16, reviewOffset []uint16, err error) {
 	switch this.JumpKind {
 	case TOKEN_JMP:
 		ret = append(ret, neander.JMP, this.Parser.labels[this.TargetLabelName])
@@ -186,10 +186,10 @@ func (this JumpStmt) WriteMemASM() (ret []uint16, err error) {
 		//TODO implement me
 		panic("implement me switch default branch in JumpStmt WriteMemASM implementation")
 	}
-	return ret, nil
+	return ret, nil, nil
 }
 
-func (this PureInstructionStmt) WriteMemASM() (ret []uint16, err error) {
+func (this PureInstructionStmt) WriteMemASM() (ret []uint16, reviewOffset []uint16, err error) {
 	switch this.Code {
 	case TOKEN_INC:
 		ret = append(ret, neander.ADD, OneValue)
@@ -210,10 +210,10 @@ func (this PureInstructionStmt) WriteMemASM() (ret []uint16, err error) {
 		//TODO implement me
 		panic("implement me switch default branch in PureInstructionStmt WriteMemASM implementation")
 	}
-	return ret, nil
+	return ret, nil, nil
 }
 
-func (this SingleInstructionStmt) WriteMemASM() (ret []uint16, err error) {
+func (this SingleInstructionStmt) WriteMemASM() (ret []uint16, reviewOffset []uint16, err error) {
 	switch this.Code {
 	case TOKEN_GET:
 		if this.Left.Kind == TOKEN_NUMBER {
@@ -222,31 +222,39 @@ func (this SingleInstructionStmt) WriteMemASM() (ret []uint16, err error) {
 			break
 		}
 		ret = append(ret, neander.LDA, this.GetLeftASUint16())
+		reviewOffset = append(reviewOffset, uint16(len(ret)))
 		break
 	case TOKEN_SET:
 		ret = append(ret, neander.STA, this.GetLeftASUint16())
+		reviewOffset = append(reviewOffset, uint16(len(ret)))
 		break
 	case TOKEN_ADD:
 		ret = append(ret, neander.ADD, this.GetLeftASUint16())
+		reviewOffset = append(reviewOffset, uint16(len(ret)))
 		break
 	case TOKEN_AND:
 		ret = append(ret, neander.AND, this.GetLeftASUint16())
+		reviewOffset = append(reviewOffset, uint16(len(ret)))
 		break
 	case TOKEN_OR:
 		ret = append(ret, neander.OR, this.GetLeftASUint16())
+		reviewOffset = append(reviewOffset, uint16(len(ret)))
 		break
 	case TOKEN_XOR:
 		ret = append(ret, neander.STA, AcCache1Addr)
 		ret = append(ret, neander.OR, this.GetLeftASUint16())
+		reviewOffset = append(reviewOffset, uint16(len(ret)))
 		ret = append(ret, neander.STA, AcCache0Addr)
 		ret = append(ret, neander.LDA, AcCache1Addr)
 		ret = append(ret, neander.AND, this.GetLeftASUint16())
+		reviewOffset = append(reviewOffset, uint16(len(ret)))
 		ret = append(ret, neander.NOT)
 		ret = append(ret, neander.AND, AcCache0Addr)
 		break
 	case TOKEN_SUB:
 		ret = append(ret, neander.STA, AcCache0Addr)
 		ret = append(ret, neander.LDA, this.GetLeftASUint16())
+		reviewOffset = append(reviewOffset, uint16(len(ret)))
 		ret = append(ret, neander.NOT)
 		ret = append(ret, neander.ADD, OneValue)
 		ret = append(ret, neander.ADD, AcCache0Addr)
@@ -254,10 +262,10 @@ func (this SingleInstructionStmt) WriteMemASM() (ret []uint16, err error) {
 		//TODO implement me
 		panic("implement me switch default branch in SingleInstructionStmt WriteMemASM implementation")
 	}
-	return ret, nil
+	return ret, reviewOffset, nil
 }
 
-func (this DoubleInstructionStmt) WriteMemASM() (ret []uint16, err error) {
+func (this DoubleInstructionStmt) WriteMemASM() (ret []uint16, reviewOffset []uint16, err error) {
 	switch this.Code {
 	case TOKEN_CPY:
 		ret = append(ret, neander.STA, AcCache0Addr)
@@ -266,13 +274,15 @@ func (this DoubleInstructionStmt) WriteMemASM() (ret []uint16, err error) {
 			ret = append(ret, neander.LDA, memAddr)
 		} else {
 			ret = append(ret, neander.LDA, this.GetRightASUint16())
+			reviewOffset = append(reviewOffset, uint16(len(ret)))
 		}
 		ret = append(ret, neander.STA, this.GetLeftASUint16())
+		reviewOffset = append(reviewOffset, uint16(len(ret)))
 		ret = append(ret, neander.LDA, AcCache0Addr)
 		break
 	default:
 		//TODO implement me
 		panic("implement me switch default branch in DoubleInstructionStmt WriteMemASM implementation")
 	}
-	return ret, nil
+	return ret, reviewOffset, nil
 }

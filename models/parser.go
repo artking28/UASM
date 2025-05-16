@@ -48,7 +48,8 @@ func (this *Parser) WriteProgram() ([]uint8, error) {
 
 	var vec [][]uint16               // Guarda os bytes de cada statement
 	var stmtSizes int                // Tamanho em tempo real do programa
-	resolveLabel := map[int]string{} // Labels que devem ter posições recalculadas após a definição do heap
+	resolveLabel := map[int]string{} // Labels que devem ter posições recalculadas após a definição do header
+	var reviewOffset []uint16        // Posicoes que devem ter posições recalculadas após a definição do header
 	for _, stmt := range this.output.Statements {
 
 		// Se for um statement de label, adiciona nos bytecode labels
@@ -58,7 +59,7 @@ func (this *Parser) WriteProgram() ([]uint8, error) {
 		}
 
 		// Transforma o statement em bytecode
-		bytes, err := stmt.WriteMemASM()
+		bytes, mems, err := stmt.WriteMemASM()
 		if err != nil {
 			return nil, err
 		}
@@ -68,6 +69,14 @@ func (this *Parser) WriteProgram() ([]uint8, error) {
 			jmpStmt := stmt.(JumpStmt)
 			resolveLabel[stmtSizes+len(bytes)-1] = jmpStmt.TargetLabelName
 		}
+
+		// Corrige as posições relativas para o programa inteiro, não o stmt
+		for i := range mems {
+			mems[i] += uint16(stmtSizes) - 1
+		}
+
+		// Adiciona no array de posições de memórias para ser recalculadas com o offset
+		reviewOffset = append(reviewOffset, mems...)
 
 		stmtSizes += len(bytes)
 		vec = append(vec, bytes)
@@ -100,9 +109,14 @@ func (this *Parser) WriteProgram() ([]uint8, error) {
 		return nil, GetUnkownLabelErr(this.Filename, v)
 	}
 
+	// Recalcula as posições de memória com o offset
+	for _, mem := range reviewOffset {
+		program[mem] += PaddingSize
+	}
+
 	// Garante q o programa não vai tentar executar o espaço reservado para constantes
 	neanderPrefix = append(neanderPrefix, neander.JMP, PaddingSize)
-	// Adiciona as constantes e os espaços de memória reversados.
+	// Adiciona as constantes e os espaços de memória reservados.
 	neanderPrefix = append(neanderPrefix, make([]uint16, constantsCount)...)
 	for k, v := range constants {
 		neanderPrefix[k] = uint16(uint8(v))

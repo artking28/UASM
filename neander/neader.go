@@ -84,8 +84,8 @@ func RunProgram(program []byte, hexa, printFinalState bool) (Result, []byte) {
 		}
 	}
 
-	fmt.Print("\nFinal memory state:\n\t")
 	if printFinalState {
+		fmt.Print("\nFinal memory state:\n\t")
 		for i, b := range program {
 			if hexa {
 				fmt.Printf("[%.3x] %.2x ", i, b)

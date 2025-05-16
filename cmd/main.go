@@ -54,13 +54,13 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	//parser.Inspect()
 	err = os.WriteFile(outputFile, content, 0744)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	InterpreterTest()
+	//parser.Inspect()
+	//InterpreterTest()
 }
 
 func InterpreterTest() {
